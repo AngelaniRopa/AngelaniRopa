@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de Telas</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+:root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;--accent:#c8f060;--accent2:#60c8f0;--accent3:#f0a060;--text:#e8e8e8;--muted:#666;--danger:#f06060;--success:#60f0a0;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;padding:40px 20px;}
+.page-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-2px;color:var(--accent);margin-bottom:8px;}
+.page-subtitle{color:var(--muted);font-size:.8rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:40px;}
+.container{max-width:900px;margin:0 auto;}
+.section{background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:24px;overflow:hidden;}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+.section-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-.5px;}
+.section-body{padding:24px;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid var(--border);border-radius:3px;background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;cursor:pointer;transition:all .15s;letter-spacing:1px;text-transform:uppercase;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+.btn:disabled:hover{border-color:var(--border);color:var(--text);}
+.btn-accent{background:var(--accent);color:#0f0f0f;border-color:var(--accent);font-weight:500;}
+.btn-accent:hover{background:#d4f570;color:#0f0f0f;}
+.btn-blue{background:var(--accent2);color:#0f0f0f;border-color:var(--accent2);font-weight:500;}
+.btn-blue:hover{background:#7dd4f5;color:#0f0f0f;}
+.btn-orange{background:var(--accent3);color:#0f0f0f;border-color:var(--accent3);font-weight:500;}
+.btn-orange:hover{background:#f5b47d;color:#0f0f0f;}
+.btn-green{background:var(--success);color:#0f0f0f;border-color:var(--success);font-weight:500;}
+.btn-green:hover{background:#7df5c0;color:#0f0f0f;}
+.btn-sm{padding:7px 14px;font-size:.75rem;}
+.btn-xs{padding:5px 10px;font-size:.7rem;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.form-grid{display:grid;gap:16px;animation:slideDown .2s ease;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);}
+.field select,.field input{background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'DM Mono',monospace;font-size:.9rem;padding:10px 14px;width:100%;transition:border-color .15s;appearance:none;}
+.field select:focus,.field input:focus{outline:none;border-color:var(--accent);}
+.field select option{background:#1a1a1a;}
+.select-wrapper{position:relative;}
+.select-wrapper::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:.8rem;}
+.form-divider{height:1px;background:var(--border);margin:8px 0;}
+/* CONTEO */
+.conteo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px;}
+.conteo-box{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:18px 20px;display:flex;align-items:center;gap:16px;}
+.conteo-box.single{grid-column:1/-1;}
+.conteo-label{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:2px;}
+.conteo-num{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:var(--accent);line-height:1;}
+.conteo-num.orange{color:var(--accent3);}
+.conteo-num.green{color:var(--success);}
+/* STOCK TABLE */
+.stock-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:.82rem;}
+.stock-table th{color:var(--muted);font-size:.65rem;letter-spacing:2px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;font-weight:400;}
+.stock-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.stock-table tr:last-child td{border-bottom:none;}
+.stock-table .tela-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--text);}
+.stock-table .qty{color:var(--accent);font-size:1.1rem;font-weight:500;}
+.stock-table .color-tags{color:var(--muted);font-size:.75rem;letter-spacing:.5px;}
+.stock-table .color-tag-val{color:var(--text);}
+/* LISTA ROLLOS (ver todos) */
+.items-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
+.list-section-label{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin:16px 0 8px;}
+.rollo-item{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:10px 14px;font-size:.8rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;animation:fadeIn .2s ease;}
+.rollo-item span{color:var(--text);}
+/* PROD */
+.prod-item{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:14px 16px;font-size:.8rem;animation:fadeIn .2s ease;margin-bottom:6px;}
+.prod-fecha{color:var(--accent2);font-weight:500;font-size:.75rem;}
+.prod-main{color:var(--text);font-size:.88rem;margin:4px 0;}
+.prod-detail{color:var(--muted);font-size:.74rem;margin-top:2px;}
+/* COSTURA */
+.costura-item{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:14px 16px;font-size:.8rem;animation:fadeIn .2s ease;margin-bottom:6px;}
+.costura-item.pendiente{border-left:3px solid var(--accent3);}
+.costura-item.finalizada{border-left:3px solid var(--success);}
+.badge{display:inline-block;padding:2px 8px;border-radius:2px;font-size:.65rem;letter-spacing:1px;text-transform:uppercase;font-weight:500;}
+.badge-pend{background:rgba(240,160,96,.15);color:var(--accent3);border:1px solid rgba(240,160,96,.3);}
+.badge-fin{background:rgba(96,240,160,.15);color:var(--success);border:1px solid rgba(96,240,160,.3);}
+.error-msg{color:var(--danger);font-size:.75rem;letter-spacing:1px;margin-top:8px;display:none;}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:32px;width:100%;max-width:440px;}
+.modal h3{font-family:'Syne',sans-serif;font-size:1.2rem;margin-bottom:20px;color:var(--accent);}
+.modal .field{margin-bottom:16px;}
+/* TABLA RECORTES */
+.tabla-wrapper{overflow-x:auto;margin-top:16px;border:1px solid var(--border);border-radius:3px;}
+table.recorte-table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:300px;}
+table.recorte-table th{background:var(--surface2);color:var(--muted);font-size:.68rem;letter-spacing:2px;text-transform:uppercase;padding:9px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
+table.recorte-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+table.recorte-table tr:last-child td{border-bottom:none;}
+table.recorte-table td input[type=number]{background:transparent;border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'DM Mono',monospace;font-size:.8rem;padding:4px 8px;width:64px;text-align:center;}
+table.recorte-table td input[type=number]:focus{outline:none;border-color:var(--accent);}
+.td-color{color:var(--text);font-weight:500;min-width:90px;}
+.talle-sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:.72rem;padding:5px 20px 5px 7px;width:100%;appearance:none;border-radius:2px;cursor:pointer;min-width:58px;}
+.talle-sel:focus{outline:none;border-color:var(--accent);}
+.btn-table-tool{background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--muted);font-family:'DM Mono',monospace;font-size:.68rem;padding:5px 10px;cursor:pointer;transition:all .15s;white-space:nowrap;text-transform:uppercase;letter-spacing:.5px;}
+.btn-table-tool:hover{border-color:var(--accent);color:var(--accent);}
+.btn-add-col{background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--accent);font-size:.9rem;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+.btn-add-col:hover{border-color:var(--accent);}
+.rollo-selector-item{background:var(--surface2);border:1px solid var(--border);border-radius:3px;margin-bottom:8px;}
+.rollo-selector-item select{background:var(--surface2);border:none;color:var(--text);font-family:'DM Mono',monospace;font-size:.85rem;padding:10px 14px;width:100%;appearance:none;cursor:pointer;}
+.rollo-selector-item select:focus{outline:none;}
+.sub-label{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px;}
+.hidden{display:none!important;}
+.tipo-btn-wrap{display:flex;gap:12px;margin-top:12px;}
+.tipo-btn{flex:1;padding:16px;border:1px solid var(--border);border-radius:3px;background:var(--surface2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.82rem;cursor:pointer;transition:all .2s;text-align:center;}
+.tipo-btn:hover,.tipo-btn.active{border-color:var(--accent);color:var(--accent);}
+.tipo-btn span{display:block;font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.tipo-btn.active span{color:var(--accent);}
+.expandir-btn{background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);font-size:.65rem;padding:2px 6px;cursor:pointer;font-family:'DM Mono',monospace;margin-left:6px;transition:all .15s;}
+.expandir-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+.talles-expand{font-size:.72rem;color:var(--muted);margin-top:4px;display:none;}
+.talles-expand.open{display:block;}
+/* TABLA STOCK FINAL */
+.sf-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.sf-table th{color:var(--muted);font-size:.65rem;letter-spacing:2px;text-transform:uppercase;padding:9px 14px;border-bottom:1px solid var(--border);text-align:left;font-weight:400;background:var(--surface2);}
+.sf-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.sf-table tr:last-child td{border-bottom:none;}
+.sf-table .sf-nombre{font-weight:500;color:var(--text);}
+.sf-table .sf-total{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;}
+.sf-row-rojo td{background:rgba(240,96,96,.07);border-left:3px solid var(--danger);}
+.sf-row-rojo .sf-total{color:var(--danger);}
+.sf-row-amarillo td{background:rgba(240,220,96,.07);border-left:3px solid #f0dc60;}
+.sf-row-amarillo .sf-total{color:#f0dc60;}
+.sf-row-verde td{background:rgba(96,240,160,.07);border-left:3px solid var(--success);}
+.sf-row-verde .sf-total{color:var(--success);}
+.sf-detail{color:var(--muted);font-size:.74rem;}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page-title">Gestión</div>
+<div class="page-subtitle">Control de stock · producción · costura</div>
+
+<!-- ══════════════ ROLLOS ══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Rollos</div>
+    <div class="btn-row">
+      <button class="btn btn-sm" id="btnCargar" onclick="triggerCargar()">⬆ Cargar stock</button>
+      <button class="btn btn-sm" onclick="abrirModalDescarga('rollos')">⬇ Descargar stock</button>
+      <input type="file" id="inputTxt" accept=".txt" style="display:none" onchange="cargarStock(event)">
+    </div>
+  </div>
+  <div class="section-body">
+    <button class="btn" onclick="toggleFormRollo()">+ Agregar rollo</button>
+
+    <div id="formRollo" class="hidden" style="margin-top:18px;">
+      <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="field"><label>Tipo de tela</label>
+          <div class="select-wrapper"><select id="rTipoTela">
+            <option value="">— seleccionar —</option>
+            <option value="grafa">Grafa</option>
+            <option value="gambardina">Gambardina</option>
+            <option value="ripstop">Ripstop</option>
+            <option value="mil rayas">Mil rayas</option>
+          </select></div>
+        </div>
+        <div class="field"><label>Color</label>
+          <div class="select-wrapper"><select id="rColor">
+            <option value="">— seleccionar —</option>
+            <option value="negro">Negro</option>
+            <option value="beige">Beige</option>
+            <option value="azul">Azul</option>
+            <option value="azul marino">Azul marino</option>
+            <option value="verde">Verde</option>
+            <option value="sin especificar">Sin especificar</option>
+          </select></div>
+        </div>
+        <div class="field"><label>Metros (entero)</label>
+          <input type="number" id="rMetros" placeholder="ej: 70" step="1" min="1">
+        </div>
+        <div class="field"><label>Fecha (DD/MM/AAAA)</label>
+          <input type="text" id="rFecha" maxlength="10" oninput="formatFecha(this)">
+        </div>
+      </div>
+      <div class="form-divider" style="margin-top:14px;"></div>
+      <div style="margin-top:12px;">
+        <button class="btn btn-accent" onclick="confirmarRollo()">✓ Confirmar rollo</button>
+        <div class="error-msg" id="errRollo">⚠ Completá todos los campos.</div>
+      </div>
+    </div>
+
+    <!-- Conteo stock -->
+    <div class="conteo-wrap">
+      <div class="conteo-box single" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <div style="display:flex;align-items:center;gap:20px;width:100%;">
+          <div><div class="conteo-label">Stock</div><div class="conteo-num" id="conteoRollos">0</div></div>
+          <div style="color:var(--muted);font-size:.75rem;">rollos en total</div>
+          <button class="btn btn-xs" id="btnVerTodos" onclick="toggleVerTodos()" style="margin-left:auto;">Ver todos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista resumen por tela (default) -->
+    <div id="stockResumen">
+      <table class="stock-table">
+        <thead><tr>
+          <th>Tela</th><th>Cantidad de rollos</th><th>Rollos por color</th>
+        </tr></thead>
+        <tbody id="stockResumenBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Vista completa (ver todos) -->
+    <div id="stockCompleto" class="hidden">
+      <div class="items-list" id="rollosList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PRODUCCIÓN ══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Producción</div>
+    <div class="btn-row">
+      <button class="btn btn-sm" id="btnCargarProd" onclick="triggerCargarProd()">⬆ Cargar producción</button>
+      <button class="btn btn-sm" onclick="abrirModalDescarga('prod')">⬇ Descargar producción</button>
+      <input type="file" id="inputTxtProd" accept=".txt" style="display:none" onchange="cargarProduccion(event)">
+    </div>
+  </div>
+  <div class="section-body">
+    <button class="btn" onclick="iniciarProduccion()">+ Agregar producción</button>
+
+    <!-- Paso 1: tipo tela + cant rollos + producto -->
+    <div id="prodPaso1" class="hidden" style="margin-top:18px;">
+      <div class="sub-label">Paso 1 — Tipo de tela, cantidad de rollos y producto</div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="field"><label>Tipo de tela</label>
+          <div class="select-wrapper"><select id="pTipoTela" onchange="actualizarConteoRollosTela()">
+            <option value="">— seleccionar —</option>
+            <option value="grafa">Grafa</option>
+            <option value="gambardina">Gambardina</option>
+            <option value="ripstop">Ripstop</option>
+            <option value="mil rayas">Mil rayas</option>
+          </select></div>
+        </div>
+        <div class="field"><label>Cantidad de rollos</label>
+          <input type="number" id="pCantRollos" min="1" step="1" placeholder="ej: 3" oninput="actualizarConteoRollosTela()">
+        </div>
+        <div class="field"><label>Producto</label>
+          <div class="select-wrapper"><select id="pProducto">
+            <option value="">— seleccionar —</option>
+            <option value="bombacha">Bombacha</option>
+            <option value="pantalon trabajo">Pantalón trabajo</option>
+            <option value="pantalon cargo">Pantalón cargo</option>
+            <option value="camisas">Camisas</option>
+            <option value="sin especificar">Sin especificar</option>
+          </select></div>
+        </div>
+      </div>
+      <div class="error-msg" id="errPaso1">⚠ Completá todos los campos. Debe haber suficientes rollos de esa tela.</div>
+      <button class="btn btn-blue btn-sm" style="margin-top:12px;" onclick="confirmarPaso1()">Continuar →</button>
+    </div>
+
+    <!-- Paso 2: Seleccionar rollos -->
+    <div id="prodPaso2" class="hidden" style="margin-top:18px;">
+      <div class="sub-label">Paso 2 — Seleccionar rollos</div>
+      <div id="selectoresRollos"></div>
+      <div class="error-msg" id="errPaso2">⚠ Seleccioná todos los rollos.</div>
+      <button class="btn btn-blue btn-sm" style="margin-top:10px;" onclick="confirmarPaso2()">Continuar →</button>
+    </div>
+
+    <!-- Paso 3: Cantidad de talles -->
+    <div id="prodPaso3" class="hidden" style="margin-top:18px;">
+      <div class="sub-label">Paso 3 — Cantidad de talles</div>
+      <div style="display:flex;align-items:flex-end;gap:12px;">
+        <div class="field" style="max-width:180px;"><label>Cantidad de talles</label>
+          <input type="number" id="pCantTalles" min="1" step="1" placeholder="ej: 4">
+        </div>
+        <button class="btn btn-blue btn-sm" onclick="confirmarPaso3()">Generar tabla →</button>
+      </div>
+      <div class="error-msg" id="errPaso3">⚠ Ingresá una cantidad válida.</div>
+    </div>
+
+    <!-- Paso 4: Tabla de recortes -->
+    <div id="prodPaso4" class="hidden" style="margin-top:18px;">
+      <div class="sub-label">Paso 4 — Recortes por color y talle</div>
+      <div class="tabla-wrapper">
+        <table class="recorte-table" id="tablaRecortes">
+          <thead id="tablaHead"></thead>
+          <tbody id="tablaBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button class="btn-add-col" onclick="agregarColumna()" title="Agregar talle">+</button>
+        <button class="btn-table-tool" onclick="poneTallesConsecutivos()">Talles consecutivos</button>
+        <button class="btn-table-tool" onclick="poneRecortesIguales()">Poner recortes</button>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-accent" onclick="confirmarProduccion()">✓ Confirmar producción</button>
+        <div class="error-msg" id="errTabla">⚠ Completá todos los campos de la tabla.</div>
+      </div>
+    </div>
+
+    <!-- Conteo producciones -->
+    <div class="conteo-wrap">
+      <div class="conteo-box single">
+        <div><div class="conteo-label">Producciones</div><div class="conteo-num" id="conteoProd">0</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;">
+          <div style="color:var(--muted);font-size:.75rem;">registradas</div>
+          <button class="btn btn-xs" id="btnVerTodasProd" onclick="toggleVerTodasProd()" style="display:none;">Ver todas</button>
+        </div>
+      </div>
+    </div>
+    <div id="prodList" class="items-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════ COSTURA ══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Costura</div>
+    <div class="btn-row">
+      <button class="btn btn-sm" id="btnCargarCostura" onclick="triggerCargarCostura()">⬆ Cargar costura</button>
+      <button class="btn btn-sm" onclick="abrirModalDescarga('costura')">⬇ Descargar costura</button>
+      <input type="file" id="inputTxtCostura" accept=".txt" style="display:none" onchange="cargarCostura(event)">
+    </div>
+  </div>
+  <div class="section-body">
+    <button class="btn" onclick="iniciarCostura()">+ Agregar costura</button>
+
+    <div id="costuraTipoSel" class="hidden" style="margin-top:14px;">
+      <div class="sub-label">¿Dónde se realiza?</div>
+      <div class="tipo-btn-wrap">
+        <div class="tipo-btn" id="tipoBtnFabrica" onclick="selTipoCostura('fabrica')"><span>Fábrica</span>producción propia</div>
+        <div class="tipo-btn" id="tipoBtnTercero" onclick="selTipoCostura('tercero')"><span>Tercero</span>taller externo</div>
+      </div>
+    </div>
+
+    <div id="costuraFormFabrica" class="hidden" style="margin-top:18px;">
+      <div class="sub-label">Nueva costura — Fábrica</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="field"><label>Fecha de ingreso (DD/MM/AAAA)</label>
+          <input type="text" id="cFechaFabrica" maxlength="10" oninput="formatFecha(this)">
+        </div>
+        <div class="field"><label>Producción a usar</label>
+          <div class="select-wrapper"><select id="cProdSel">
+            <option value="">— seleccionar —</option>
+          </select></div>
+        </div>
+      </div>
+      <button class="btn btn-blue btn-sm" style="margin-top:12px;" onclick="confirmarCosturaFabrica()">Confirmar →</button>
+      <div class="error-msg" id="errCostFabrica">⚠ Completá todos los campos.</div>
+    </div>
+
+    <div id="costuraFormTercero" class="hidden" style="margin-top:18px;">
+      <div class="sub-label">Nueva costura — Tercero</div>
+      <div class="form-grid">
+        <div class="field"><label>Fecha de ingreso (DD/MM/AAAA)</label>
+          <input type="text" id="cFechaTercero" maxlength="10" oninput="formatFecha(this)">
+        </div>
+        <div class="field"><label>Producción a usar</label>
+          <div class="select-wrapper"><select id="cProdSelTercero">
+            <option value="">— sin producción —</option>
+          </select></div>
+        </div>
+        <div class="field"><label>Nombre del tercero</label>
+          <input type="text" id="cNombreTercero" placeholder="ej: Taller San Martín">
+        </div>
+        <div class="field"><label>Descripción</label>
+          <input type="text" id="cDescTercero" placeholder="ej: 50 bombachas grafa negro">
+        </div>
+      </div>
+      <button class="btn btn-blue btn-sm" style="margin-top:12px;" onclick="confirmarCosturaTercero()">Confirmar →</button>
+      <div class="error-msg" id="errCostTercero">⚠ Completá fecha, nombre y descripción.</div>
+    </div>
+
+    <!-- Conteo costura -->
+    <div class="conteo-wrap" style="margin-top:28px;">
+      <div class="conteo-box">
+        <div><div class="conteo-label">Pendientes</div><div class="conteo-num orange" id="conteoCostPend">0</div></div>
+        <div style="color:var(--muted);font-size:.75rem;">en proceso</div>
+      </div>
+      <div class="conteo-box">
+        <div><div class="conteo-label">Finalizadas</div><div class="conteo-num green" id="conteoCostFin">0</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+          <div style="color:var(--muted);font-size:.75rem;">entregadas</div>
+          <button class="btn btn-xs" id="btnVerTodasCost" onclick="toggleVerTodasCost()" style="display:none;">Ver todas</button>
+        </div>
+      </div>
+    </div>
+    <div id="costuraPendList" class="items-list"></div>
+    <div id="costuraFinList" class="items-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════ STOCK FINAL ══════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Stock</div>
+    <div class="btn-row">
+      <button class="btn btn-sm" id="btnCargarStock" onclick="triggerCargarStockFinal()">⬆ Cargar stock</button>
+      <button class="btn btn-sm" onclick="abrirModalDescarga('stock')">⬇ Descargar stock</button>
+      <input type="file" id="inputTxtStock" accept=".txt" style="display:none" onchange="cargarStockFinal(event)">
+    </div>
+  </div>
+  <div class="section-body">
+
+    <!-- Lista prendas -->
+    <div class="sub-label" style="margin-bottom:8px;">Prendas</div>
+    <div style="overflow-x:auto;border:1px solid var(--border);border-radius:3px;">
+      <table class="sf-table" id="sfTablePrendas">
+        <thead><tr>
+          <th>Producto</th>
+          <th>Total</th>
+          <th>Por color y talles</th>
+        </tr></thead>
+        <tbody id="sfBodyPrendas"></tbody>
+      </table>
+    </div>
+
+    <!-- Lista avíos -->
+    <div style="display:flex;align-items:center;gap:14px;margin-top:28px;margin-bottom:8px;">
+      <div class="sub-label" style="margin:0;">Avíos</div>
+      <button class="btn btn-xs" onclick="toggleFormAvio()">+ Agregar</button>
+    </div>
+    <div id="formAvio" class="hidden" style="margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
+        <div class="field"><label>Tipo de avío</label>
+          <div class="select-wrapper"><select id="avTipo">
+            <option value="">— seleccionar —</option>
+            <option value="hilos">Hilos</option>
+            <option value="botones">Botones</option>
+            <option value="cremalleras">Cremalleras</option>
+            <option value="elástico">Elástico</option>
+            <option value="etiquetas">Etiquetas</option>
+            <option value="otro">Otro</option>
+          </select></div>
+        </div>
+        <div class="field"><label>Cantidad</label>
+          <input type="number" id="avCantidad" min="1" step="1" placeholder="ej: 200">
+        </div>
+        <button class="btn btn-accent btn-sm" onclick="confirmarAvio()" style="height:42px;">✓</button>
+      </div>
+      <div class="error-msg" id="errAvio">⚠ Completá tipo y cantidad.</div>
+    </div>
+    <div style="overflow-x:auto;border:1px solid var(--border);border-radius:3px;">
+      <table class="sf-table" id="sfTableAvios">
+        <thead><tr><th>Avío</th><th>Cantidad</th></tr></thead>
+        <tbody id="sfBodyAvios"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<!-- MODAL DESCARGA -->
+<div class="modal-overlay" id="modalDescarga">
+  <div class="modal">
+    <h3 id="modalDescTitulo">Descargar</h3>
+    <div class="field"><label>Fecha del archivo (DD/MM/AAAA)</label>
+      <input type="text" id="fechaDescInput" maxlength="10" oninput="formatFecha(this)">
+    </div>
+    <div class="btn-row" style="justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-sm" onclick="cerrarModal('modalDescarga')">Cancelar</button>
+      <button class="btn btn-accent btn-sm" id="btnDescConfirm">Descargar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FECHA+HORA PRODUCCIÓN -->
+<div class="modal-overlay" id="modalFechaProd">
+  <div class="modal">
+    <h3>Confirmar producción</h3>
+    <div class="field"><label>Fecha (DD/MM/AAAA)</label>
+      <input type="text" id="mFechaProd" maxlength="10" oninput="formatFecha(this)">
+    </div>
+    <div class="btn-row" style="justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-sm" onclick="cerrarModal('modalFechaProd')">Cancelar</button>
+      <button class="btn btn-accent btn-sm" onclick="finalizarProduccion()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FINALIZAR COSTURA -->
+<div class="modal-overlay" id="modalFinCost">
+  <div class="modal">
+    <h3>Finalizar costura</h3>
+    <div class="field"><label>Fecha de finalización (DD/MM/AAAA)</label>
+      <input type="text" id="mFechaFinCost" maxlength="10" oninput="formatFecha(this)">
+    </div>
+    <div class="btn-row" style="justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-sm" onclick="cerrarModal('modalFinCost')">Cancelar</button>
+      <button class="btn btn-green btn-sm" onclick="confirmarFinCost()">Finalizar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  ESTADO
+// ══════════════════════════════════════════════════
+let rollos = [];          // {id, tipoTela, color, metros, fecha}
+let producciones = [];    // array de producciones confirmadas
+let costuras = [];        // todas las costuras
+
+let stockYaCargado = false;   // bloquear cargar txt rollos más de una vez
+let prodYaCargada = false;    // bloquear cargar prod más de una vez
+let costuraYaCargada = false; // bloquear cargar costura más de una vez
+
+let formRolloVisible = false;
+let verTodosRollos = false;
+let verTodasProd = false;
+let verTodasCost = false;
+let costFinalizandoId = null;
+
+// estado producción en curso
+let pE = { tipoTela:'', cantRollos:0, producto:'', rollosElegidos:[], colores:[], talles:[], datosTabla:{} };
+
+// Iniciales de color
+const INICIALES = {negro:'N', beige:'B', azul:'A', 'azul marino':'AM', verde:'V', 'sin especificar':'SE'};
+const TELAS = ['grafa','gambardina','ripstop','mil rayas'];
+
+// ══════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════
+function hoy(){
+  const d=new Date();
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+}
+function ahoraStr(){
+  const d=new Date();
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+}
+function generarId(){
+  const d=new Date();
+  return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')
+    +'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+String(d.getSeconds()).padStart(2,'0')
+    +String(d.getMilliseconds()).padStart(3,'0');
+}
+function formatFecha(inp){
+  let v=inp.value.replace(/\D/g,'');
+  if(v.length>2)v=v.slice(0,2)+'/'+v.slice(2);
+  if(v.length>5)v=v.slice(0,5)+'/'+v.slice(5);
+  inp.value=v;
+}
+function cerrarModal(id){document.getElementById(id).classList.remove('active');}
+function descargarArchivo(contenido,nombre){
+  const b=new Blob([contenido],{type:'text/plain;charset=utf-8'});
+  const u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download=nombre;a.click();URL.revokeObjectURL(u);
+}
+function colorTag(color){return INICIALES[color]||color.slice(0,2).toUpperCase();}
+
+// ══════════════════════════════════════════════════
+//  ROLLOS
+// ══════════════════════════════════════════════════
+function toggleFormRollo(){
+  formRolloVisible=!formRolloVisible;
+  const f=document.getElementById('formRollo');
+  if(formRolloVisible){
+    f.classList.remove('hidden');
+    document.getElementById('rTipoTela').value='';
+    document.getElementById('rColor').value='';
+    document.getElementById('rMetros').value='';
+    document.getElementById('rFecha').value=hoy();
+    document.getElementById('errRollo').style.display='none';
+  } else f.classList.add('hidden');
+}
+
+function confirmarRollo(){
+  const tela=document.getElementById('rTipoTela').value;
+  const color=document.getElementById('rColor').value;
+  const metros=document.getElementById('rMetros').value;
+  const fecha=document.getElementById('rFecha').value;
+  const err=document.getElementById('errRollo');
+  if(!tela||!color||!metros||parseInt(metros)<1||!fecha||fecha.length<10){err.style.display='block';return;}
+  err.style.display='none';
+
+  const id=generarId();
+  // Verificar unicidad de id (rarísimo pero por si acaso)
+  if(rollos.some(r=>r.id===id)){setTimeout(confirmarRollo,2);return;}
+
+  rollos.push({id, tipoTela:tela, color, metros:parseInt(metros), fecha});
+  document.getElementById('btnCargar').disabled=true; // ya no se puede cargar
+  stockYaCargado=true;
+  renderRollos();
+  document.getElementById('formRollo').classList.add('hidden');
+  formRolloVisible=false;
+}
+
+function renderRollos(){
+  // Conteo total
+  document.getElementById('conteoRollos').textContent=rollos.length;
+
+  // Resumen por tela
+  const body=document.getElementById('stockResumenBody');
+  body.innerHTML='';
+  TELAS.forEach(tela=>{
+    const deEsaTela=rollos.filter(r=>r.tipoTela===tela);
+    const colorCounts={};
+    deEsaTela.forEach(r=>{ colorCounts[r.color]=(colorCounts[r.color]||0)+1; });
+    const colorStr=Object.entries(colorCounts).map(([c,n])=>`<span class="color-tag-val">${colorTag(c)} ${n}</span>`).join(' ');
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="tela-name">${tela.charAt(0).toUpperCase()+tela.slice(1)}</td>
+      <td class="qty">${deEsaTela.length}</td>
+      <td class="color-tags">${colorStr||'<span style="color:var(--muted)">—</span>'}</td>`;
+    body.appendChild(tr);
+  });
+
+  // Lista completa
+  const list=document.getElementById('rollosList');
+  list.innerHTML='';
+  [...rollos].reverse().forEach(r=>{
+    const div=document.createElement('div');
+    div.className='rollo-item';
+    div.innerHTML=`<span style="color:var(--accent);font-weight:500;">${r.tipoTela}</span>
+      <span>${r.metros}m</span>&nbsp;·&nbsp;<span>${r.color}</span>&nbsp;·&nbsp;<span>${r.fecha}</span>`;
+    list.appendChild(div);
+  });
+}
+
+function toggleVerTodos(){
+  verTodosRollos=!verTodosRollos;
+  document.getElementById('stockResumen').classList.toggle('hidden',verTodosRollos);
+  document.getElementById('stockCompleto').classList.toggle('hidden',!verTodosRollos);
+  document.getElementById('btnVerTodos').textContent=verTodosRollos?'Ver resumen':'Ver todos';
+}
+
+// ── Cargar / Descargar stock ──
+function triggerCargar(){
+  if(stockYaCargado){alert('Solo se puede cargar el stock una vez.');return;}
+  document.getElementById('inputTxt').click();
+}
+function cargarStock(ev){
+  const file=ev.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>parsearTxtRollos(e.target.result);
+  reader.readAsText(file);
+  ev.target.value='';
+}
+function parsearTxtRollos(texto){
+  const bloques=texto.split(/-------\n/).filter(b=>b.trim());
+  let n=0;
+  const idsNuevas=new Set();
+  bloques.forEach(bloque=>{
+    const lineas=bloque.split('\n').filter(l=>l.trim()&&l.trim()!=='------');
+    const obj={};
+    lineas.forEach(l=>{const i=l.indexOf(':');if(i!==-1)obj[l.slice(0,i).trim().toLowerCase()]=l.slice(i+1).trim();});
+    if(obj['tipo de tela']&&obj.color&&obj.fecha&&obj['id unica']){
+      const id=obj['id unica'];
+      if(rollos.some(r=>r.id===id)||idsNuevas.has(id))return; // no duplicar
+      idsNuevas.add(id);
+      rollos.push({id, tipoTela:obj['tipo de tela'], color:obj.color,
+        metros:parseInt(obj.metros)||0, fecha:obj.fecha});
+      n++;
+    }
+  });
+  if(n>0){
+    stockYaCargado=true;
+    document.getElementById('btnCargar').disabled=true;
+    renderRollos();
+    alert(`✓ Se cargaron ${n} rollos.`);
+  } else alert('No se encontraron rollos válidos.');
+}
+
+function abrirModalDescarga(tipo){
+  if(tipo==='rollos'&&rollos.length===0){alert('No hay rollos para descargar.');return;}
+  if(tipo==='prod'&&producciones.length===0){alert('No hay producciones para descargar.');return;}
+  if(tipo==='costura'&&costuras.length===0){alert('No hay costuras para descargar.');return;}
+  if(tipo==='stock'&&costuras.filter(c=>c.estado==='finalizada').length===0&&avios.length===0){alert('No hay stock para descargar.');return;}
+  document.getElementById('fechaDescInput').value=hoy();
+  document.getElementById('modalDescTitulo').textContent=
+    tipo==='rollos'?'Descargar stock de rollos':tipo==='prod'?'Descargar producción':tipo==='costura'?'Descargar costura':'Descargar stock';
+  const btn=document.getElementById('btnDescConfirm');
+  btn.onclick=tipo==='rollos'?descRollos:tipo==='prod'?descProd:tipo==='costura'?descCostura:descStock;
+  document.getElementById('modalDescarga').classList.add('active');
+}
+
+function descRollos(){
+  const f=document.getElementById('fechaDescInput').value.trim();
+  if(f.length<10){alert('Fecha inválida.');return;}
+  const contenido=rollos.map(r=>`-------\ntipo de tela: ${r.tipoTela}\ncolor: ${r.color}\nmetros: ${r.metros}\nfecha: ${r.fecha}\nid unica: ${r.id}\n------`).join('\n');
+  descargarArchivo(contenido,`RollosStock_${f.replace(/\//g,'-')}.txt`);
+  cerrarModal('modalDescarga');
+}
+
+// ══════════════════════════════════════════════════
+//  PRODUCCIÓN
+// ══════════════════════════════════════════════════
+function iniciarProduccion(){
+  if(rollos.length===0){alert('No hay rollos en stock.');return;}
+  resetProdPasos();
+  document.getElementById('prodPaso1').classList.remove('hidden');
+  document.getElementById('pTipoTela').value='';
+  document.getElementById('pCantRollos').value='';
+  document.getElementById('pProducto').value='';
+  document.getElementById('errPaso1').style.display='none';
+}
+function resetProdPasos(){
+  ['prodPaso1','prodPaso2','prodPaso3','prodPaso4'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  pE={tipoTela:'',cantRollos:0,producto:'',rollosElegidos:[],colores:[],talles:[],datosTabla:{}};
+}
+function actualizarConteoRollosTela(){
+  // solo feedback visual, no hace nada más
+}
+function confirmarPaso1(){
+  const tela=document.getElementById('pTipoTela').value;
+  const cant=parseInt(document.getElementById('pCantRollos').value);
+  const prod=document.getElementById('pProducto').value;
+  const err=document.getElementById('errPaso1');
+  const rollosDeTela=rollos.filter(r=>r.tipoTela===tela);
+  if(!tela||!prod||isNaN(cant)||cant<1||cant>rollosDeTela.length){
+    err.style.display='block';
+    err.textContent=`⚠ Completá todo. Hay ${rollosDeTela.length} rollo(s) de ${tela||'esa tela'}.`;
+    return;
+  }
+  err.style.display='none';
+  pE.tipoTela=tela; pE.cantRollos=cant; pE.producto=prod;
+  document.getElementById('prodPaso1').classList.add('hidden');
+  document.getElementById('prodPaso2').classList.remove('hidden');
+  construirSelectores();
+}
+
+function construirSelectores(){
+  const cont=document.getElementById('selectoresRollos');
+  cont.innerHTML='';
+  // Grupos de rollos de la tela seleccionada (por color+metros)
+  const grupos={};
+  rollos.filter(r=>r.tipoTela===pE.tipoTela).forEach(r=>{
+    const key=`${r.color}|${r.metros}`;
+    if(!grupos[key])grupos[key]={color:r.color,metros:r.metros,ids:[]};
+    grupos[key].ids.push(r.id);
+  });
+  pE._grupos=grupos; // guardar referencia
+
+  for(let i=0;i<pE.cantRollos;i++){
+    const wrap=document.createElement('div');
+    wrap.className='rollo-selector-item';
+    wrap.innerHTML=`<div class="select-wrapper"><select id="selRollo_${i}" onchange="recalcSelectores()">
+      <option value="">— Rollo ${i+1}: seleccionar —</option>
+      ${Object.entries(grupos).map(([key,g])=>
+        `<option value="${key}">${g.color} · ${g.metros}m (×${g.ids.length})</option>`
+      ).join('')}
+    </select></div>`;
+    cont.appendChild(wrap);
+  }
+  document.getElementById('errPaso2').style.display='none';
+}
+
+function recalcSelectores(){
+  // Para cada selector, mostrar cuántos quedan disponibles
+  const cant=pE.cantRollos;
+  // Contar cuántas veces se eligió cada key
+  const conteo={};
+  for(let i=0;i<cant;i++){
+    const v=document.getElementById(`selRollo_${i}`)?.value;
+    if(v)conteo[v]=(conteo[v]||0)+1;
+  }
+  for(let i=0;i<cant;i++){
+    const sel=document.getElementById(`selRollo_${i}`);if(!sel)continue;
+    const propio=sel.value;
+    Array.from(sel.options).forEach(opt=>{
+      if(!opt.value)return;
+      const g=pE._grupos[opt.value];
+      const usados=conteo[opt.value]||0;
+      const disponibles=g.ids.length-usados+(opt.value===propio?1:0);
+      if(disponibles<=0){
+        opt.disabled=true;
+        opt.textContent=`${g.color} · ${g.metros}m (agotado)`;
+      } else {
+        opt.disabled=false;
+        opt.textContent=`${g.color} · ${g.metros}m (×${disponibles})`;
+      }
+    });
+  }
+}
+
+function confirmarPaso2(){
+  const cant=pE.cantRollos;
+  const err=document.getElementById('errPaso2');
+  // Validar que todos estén elegidos y que no se excedan los disponibles
+  const conteo={};
+  for(let i=0;i<cant;i++){
+    const v=document.getElementById(`selRollo_${i}`)?.value;
+    if(!v){err.style.display='block';return;}
+    conteo[v]=(conteo[v]||0)+1;
+  }
+  for(const[key,n] of Object.entries(conteo)){
+    if(n>pE._grupos[key].ids.length){err.style.display='block';return;}
+  }
+  err.style.display='none';
+  pE._selConteo=conteo;
+  pE.colores=[...new Set(Object.keys(conteo).map(k=>k.split('|')[0]))];
+  document.getElementById('prodPaso2').classList.add('hidden');
+  document.getElementById('prodPaso3').classList.remove('hidden');
+  document.getElementById('pCantTalles').value='';
+  document.getElementById('errPaso3').style.display='none';
+}
+
+function confirmarPaso3(){
+  const n=parseInt(document.getElementById('pCantTalles').value);
+  const err=document.getElementById('errPaso3');
+  if(isNaN(n)||n<1){err.style.display='block';return;}
+  err.style.display='none';
+  // Talles 0,2,4,...60 — arrancan seleccionados desde 40
+  const todosLosTalles=Array.from({length:31},(_,i)=>i*2); // 0,2,...60
+  const desde=todosLosTalles.indexOf(40);
+  pE.talles=todosLosTalles.slice(desde,desde+n);
+  pE.datosTabla={};
+  document.getElementById('prodPaso3').classList.add('hidden');
+  document.getElementById('prodPaso4').classList.remove('hidden');
+  renderTabla();
+}
+
+function guardarDatosTabla(){
+  pE.colores.forEach(color=>{
+    const ck=color.replace(/ /g,'_');
+    if(!pE.datosTabla[color])pE.datosTabla[color]={};
+    pE.talles.forEach((_,ci)=>{
+      const inp=document.getElementById(`cel_${ck}_${ci}`);
+      if(inp)pE.datosTabla[color][ci]=inp.value;
+    });
+  });
+}
+
+function renderTabla(){
+  const head=document.getElementById('tablaHead');
+  const body=document.getElementById('tablaBody');
+  const todosLosTalles=Array.from({length:31},(_,i)=>i*2); // 0,2,...60
+
+  head.innerHTML='';
+  const trH=document.createElement('tr');
+  trH.innerHTML='<th>Color</th>';
+  pE.talles.forEach((t,ci)=>{
+    const th=document.createElement('th');
+    th.innerHTML=`<div class="select-wrapper" style="min-width:60px;">
+      <select class="talle-sel" onchange="cambiarTalle(this,${ci})">
+        ${todosLosTalles.map(n=>`<option value="${n}"${n===t?' selected':''}>${n}</option>`).join('')}
+      </select></div>`;
+    trH.appendChild(th);
+  });
+  head.appendChild(trH);
+
+  body.innerHTML='';
+  pE.colores.forEach(color=>{
+    const ck=color.replace(/ /g,'_');
+    const tr=document.createElement('tr');
+    let cells=`<td class="td-color">${color}</td>`;
+    pE.talles.forEach((_,ci)=>{
+      const saved=pE.datosTabla[color]&&pE.datosTabla[color][ci]!=null?pE.datosTabla[color][ci]:'';
+      cells+=`<td><input type="number" min="0" step="1" placeholder="0" id="cel_${ck}_${ci}" value="${saved}"></td>`;
+    });
+    tr.innerHTML=cells;
+    body.appendChild(tr);
+  });
+}
+
+function cambiarTalle(sel,ci){
+  guardarDatosTabla();
+  pE.talles[ci]=parseInt(sel.value);
+  renderTabla();
+}
+
+function agregarColumna(){
+  guardarDatosTabla();
+  const todosLosTalles=Array.from({length:31},(_,i)=>i*2); // 0,2,...60
+  const ultimo=pE.talles[pE.talles.length-1];
+  const siguiente=todosLosTalles.find(t=>t>ultimo&&!pE.talles.includes(t));
+  if(siguiente===undefined){alert('No hay más talles disponibles (máximo 60).');return;}
+  pE.talles.push(siguiente);
+  renderTabla();
+}
+
+function poneTallesConsecutivos(){
+  guardarDatosTabla();
+  const todosLosTalles=Array.from({length:31},(_,i)=>i*2); // 0,2,...60
+  if(pE.talles.length===0)return;
+  const primero=pE.talles[0];
+  const idx=todosLosTalles.indexOf(primero);
+  if(idx===-1)return;
+  for(let i=1;i<pE.talles.length;i++){
+    const nuevoTalle=todosLosTalles[idx+i];
+    if(nuevoTalle)pE.talles[i]=nuevoTalle;
+  }
+  renderTabla();
+}
+
+function poneRecortesIguales(){
+  // Para cada color, copia el valor de la primera columna a todas las demás
+  pE.colores.forEach(color=>{
+    const ck=color.replace(/ /g,'_');
+    const primerInp=document.getElementById(`cel_${ck}_0`);
+    if(!primerInp||primerInp.value==='')return;
+    const val=primerInp.value;
+    pE.talles.forEach((_,ci)=>{
+      if(ci===0)return;
+      const inp=document.getElementById(`cel_${ck}_${ci}`);
+      if(inp)inp.value=val;
+    });
+  });
+}
+
+function confirmarProduccion(){
+  const err=document.getElementById('errTabla');
+  let ok=true;
+  pE.colores.forEach(color=>{
+    pE.talles.forEach((_,ci)=>{
+      const inp=document.getElementById(`cel_${color.replace(/ /g,'_')}_${ci}`);
+      if(!inp||inp.value===''||isNaN(parseInt(inp.value)))ok=false;
+    });
+  });
+  if(!ok){err.style.display='block';return;}
+  err.style.display='none';
+  document.getElementById('mFechaProd').value=hoy();
+  document.getElementById('modalFechaProd').classList.add('active');
+}
+
+function finalizarProduccion(){
+  const fecha=document.getElementById('mFechaProd').value.trim();
+  if(fecha.length<10){alert('Fecha inválida.');return;}
+  const hora=ahoraStr();
+  cerrarModal('modalFechaProd');
+
+  // Recopilar datos
+  const cantPorColorTalle={};
+  pE.colores.forEach(color=>{
+    cantPorColorTalle[color]={};
+    pE.talles.forEach((t,ci)=>{
+      const inp=document.getElementById(`cel_${color.replace(/ /g,'_')}_${ci}`);
+      cantPorColorTalle[color][t]=parseInt(inp.value)||0;
+    });
+  });
+
+  let totalPrendas=0;
+  pE.colores.forEach(c=>pE.talles.forEach(t=>{totalPrendas+=cantPorColorTalle[c][t]||0;}));
+
+  let totalMetros=0;
+  Object.entries(pE._selConteo).forEach(([key,n])=>{
+    const metros=parseInt(key.split('|')[1]);
+    totalMetros+=metros*n;
+  });
+
+  const metrosPorPrenda=totalPrendas>0?parseFloat((totalMetros/totalPrendas).toFixed(2)):0;
+
+  const porColor={};
+  pE.colores.forEach(c=>{
+    let sum=0;pE.talles.forEach(t=>{sum+=cantPorColorTalle[c][t]||0;});
+    porColor[c]=sum;
+  });
+
+  const prod={
+    id:generarId(),
+    fecha,hora,
+    rollosUsados:pE.cantRollos,
+    tipoTela:pE.tipoTela,
+    producto:pE.producto,
+    totalPrendas,
+    cantPorColorTalle,
+    colores:[...pE.colores],
+    talles:[...pE.talles],
+    totalMetros,
+    metrosPorPrenda,
+    porColor
+  };
+  producciones.push(prod);
+
+  // Descontar rollos del stock
+  Object.entries(pE._selConteo).forEach(([key,n])=>{
+    const[color,metrosStr]=key.split('|');
+    let eliminados=0;
+    rollos=rollos.filter(r=>{
+      if(eliminados<n&&r.tipoTela===pE.tipoTela&&r.color===color&&r.metros===parseInt(metrosStr)){
+        eliminados++;return false;
+      }
+      return true;
+    });
+  });
+  renderRollos();
+  renderProducciones();
+  actualizarSelectorProd();
+  resetProdPasos();
+}
+
+function porColorStr(prod){
+  return prod.colores.map(c=>`${c.charAt(0).toUpperCase()+c.slice(1)} ${prod.porColor[c]}`).join(' · ');
+}
+function tallesStr(prod){
+  return prod.colores.map(c=>
+    `${c} ${prod.talles.map(t=>`T${t}.${prod.cantPorColorTalle[c][t]}`).join(' ')}`
+  ).join(' — ');
+}
+
+function renderProducciones(){
+  document.getElementById('conteoProd').textContent=producciones.length;
+  const list=document.getElementById('prodList');
+  list.innerHTML='';
+  const btn=document.getElementById('btnVerTodasProd');
+  if(producciones.length>5){btn.style.display='inline-flex';btn.textContent=verTodasProd?'Ver menos':`Ver todas (${producciones.length})`;}
+  else btn.style.display='none';
+  const orden=[...producciones].reverse();
+  (verTodasProd?orden:orden.slice(0,5)).forEach(p=>{
+    const div=document.createElement('div');div.className='prod-item';
+    const tid=`talles_${p.id}`;
+    div.innerHTML=`<div class="prod-fecha">${p.fecha} ${p.hora}</div>
+      <div class="prod-main">${p.producto} · ${p.tipoTela} · ${p.totalPrendas} prendas · ${p.rollosUsados} rollos</div>
+      <div class="prod-detail">${p.metrosPorPrenda}m/prenda · ${p.totalMetros}m total · ${porColorStr(p)}
+        <button class="expandir-btn" onclick="toggleTalles('${tid}')">+</button>
+      </div>
+      <div class="talles-expand" id="${tid}">${tallesStr(p)}</div>`;
+    list.appendChild(div);
+  });
+  actualizarSelectorProd();
+}
+function toggleVerTodasProd(){verTodasProd=!verTodasProd;renderProducciones();}
+function toggleTalles(id){
+  const el=document.getElementById(id);if(!el)return;
+  el.classList.toggle('open');
+  // cambiar texto del botón
+  const btn=el.previousElementSibling?.querySelector('.expandir-btn');
+  if(btn)btn.textContent=el.classList.contains('open')?'−':'+';
+}
+
+// TXT Producción
+function generarTxtProd(){
+  return producciones.map(p=>`-------\nfecha: ${p.fecha}\nhora: ${p.hora}\nrollos usados: ${p.rollosUsados}\ntipo de tela: ${p.tipoTela}\nproducto: ${p.producto}\nTotal: ${p.totalPrendas}\nmetros totales: ${p.totalMetros}\nmetros por prenda: ${p.metrosPorPrenda}\nPor color: ${p.colores.map(c=>`${c} ${p.porColor[c]}`).join(' ')}\ntalles: ${tallesStr(p)}\n------`).join('\n');
+}
+function descProd(){
+  const f=document.getElementById('fechaDescInput').value.trim();
+  if(f.length<10){alert('Fecha inválida.');return;}
+  descargarArchivo(generarTxtProd(),`Produccion_${f.replace(/\//g,'-')}.txt`);
+  cerrarModal('modalDescarga');
+}
+function triggerCargarProd(){
+  if(prodYaCargada||producciones.length>0){alert('No se puede cargar producción si ya hay producciones.');return;}
+  document.getElementById('inputTxtProd').click();
+}
+function cargarProduccion(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>parsearTxtProd(e.target.result);
+  reader.readAsText(file);
+  ev.target.value='';
+}
+function parsearTxtProd(texto){
+  const bloques=texto.split(/-------\n/).filter(b=>b.trim());
+  let n=0;
+  bloques.forEach(bloque=>{
+    const lineas=bloque.split('\n').filter(l=>l.trim()&&!l.match(/^-{5,}$/));
+    const obj={};
+    const tallesLinea=lineas.find(l=>l.toLowerCase().startsWith('talles:'))||'';
+    const porColorLinea=lineas.find(l=>l.toLowerCase().startsWith('por color:'))||'';
+    lineas.forEach(l=>{
+      if(l.toLowerCase().startsWith('talles:')||l.toLowerCase().startsWith('por color:'))return;
+      const i=l.indexOf(':');if(i!==-1)obj[l.slice(0,i).trim().toLowerCase()]=l.slice(i+1).trim();
+    });
+    if(!obj.fecha)return;
+    // parsear talles: Negro T44.2 T46.2 Azul T44.4
+    const colores=[];const cantPorColorTalle={};const tallesSet=new Set();
+    const COLS_CONOCIDOS=['negro','beige','azul marino','azul','verde','sin especificar'];
+    const tStr=tallesLinea.replace(/^talles:\s*/i,'').trim();
+    // Split por colores conocidos
+    let restante=tStr;
+    while(restante.trim()){
+      let matchedColor=null,matchedIdx=Infinity;
+      COLS_CONOCIDOS.forEach(col=>{
+        const re=new RegExp('\\b'+col.replace(/ /g,'\\s+')+'\\b','i');
+        const m=re.exec(restante);
+        if(m&&m.index<matchedIdx){matchedIdx=m.index;matchedColor=col;}
+      });
+      if(!matchedColor)break;
+      const sm=new RegExp(matchedColor.replace(/ /g,'\\s+'),'i').exec(restante);
+      if(!sm)break;
+      const afterColor=restante.slice(sm.index+sm[0].length).trim();
+      let endIdx=afterColor.length;
+      COLS_CONOCIDOS.forEach(col=>{
+        const re=new RegExp('\\b'+col.replace(/ /g,'\\s+')+'\\b','i');
+        const m=re.exec(afterColor);
+        if(m&&m.index<endIdx)endIdx=m.index;
+      });
+      const datos=afterColor.slice(0,endIdx).trim();
+      const color=matchedColor.toLowerCase();
+      colores.push(color);cantPorColorTalle[color]={};
+      const tokens=datos.match(/T(\d+)\.(\d+)/gi)||[];
+      tokens.forEach(tok=>{
+        const m=tok.match(/T(\d+)\.(\d+)/i);
+        if(m){const t=parseInt(m[1]),c=parseInt(m[2]);cantPorColorTalle[color][t]=c;tallesSet.add(t);}
+      });
+      restante=afterColor.slice(endIdx);
+    }
+    const talles=[...tallesSet].sort((a,b)=>a-b);
+    let total=parseInt(obj['total'])||0;
+    const porColor={};
+    const pcStr=porColorLinea.replace(/^por color:\s*/i,'').trim();
+    COLS_CONOCIDOS.forEach(col=>{
+      const re=new RegExp('\\b'+col.replace(/ /g,'\\s+')+'\\s+(\\d+)','i');
+      const m=re.exec(pcStr);
+      if(m)porColor[col.toLowerCase()]=parseInt(m[1]);
+    });
+    producciones.push({
+      id:generarId()+n,
+      fecha:obj.fecha,hora:obj.hora||'',
+      rollosUsados:parseInt(obj['rollos usados'])||0,
+      tipoTela:obj['tipo de tela']||'',
+      producto:obj.producto||'',
+      totalPrendas:total,
+      cantPorColorTalle,colores,talles,
+      totalMetros:parseFloat(obj['metros totales'])||0,
+      metrosPorPrenda:parseFloat(obj['metros por prenda'])||0,
+      porColor
+    });
+    n++;
+  });
+  if(n>0){prodYaCargada=true;renderProducciones();alert(`✓ Se cargaron ${n} producciones.`);}
+  else alert('No se encontraron producciones válidas.');
+}
+
+// ══════════════════════════════════════════════════
+//  COSTURA
+// ══════════════════════════════════════════════════
+function actualizarSelectorProd(){
+  [document.getElementById('cProdSel'),document.getElementById('cProdSelTercero')].forEach(sel=>{
+    if(!sel)return;
+    const prev=sel.value;
+    sel.innerHTML='<option value="">— sin producción —</option>';
+    producciones.forEach(p=>{
+      const opt=document.createElement('option');
+      opt.value=String(p.id);
+      opt.textContent=`${p.fecha} · ${p.producto} · ${p.tipoTela} · ${p.totalPrendas}p`;
+      sel.appendChild(opt);
+    });
+    sel.value=prev;
+  });
+}
+function iniciarCostura(){
+  if(costuraYaCargada||costuras.length>0){
+    // No bloquear agregar si ya hay, solo bloquear CARGAR
+  }
+  document.getElementById('costuraTipoSel').classList.remove('hidden');
+  document.getElementById('costuraFormFabrica').classList.add('hidden');
+  document.getElementById('costuraFormTercero').classList.add('hidden');
+  document.getElementById('tipoBtnFabrica').classList.remove('active');
+  document.getElementById('tipoBtnTercero').classList.remove('active');
+}
+function selTipoCostura(tipo){
+  document.getElementById('tipoBtnFabrica').classList.toggle('active',tipo==='fabrica');
+  document.getElementById('tipoBtnTercero').classList.toggle('active',tipo==='tercero');
+  document.getElementById('costuraFormFabrica').classList.toggle('hidden',tipo!=='fabrica');
+  document.getElementById('costuraFormTercero').classList.toggle('hidden',tipo!=='tercero');
+  if(tipo==='fabrica'){
+    document.getElementById('cFechaFabrica').value=hoy();
+    actualizarSelectorProd();
+    document.getElementById('errCostFabrica').style.display='none';
+  } else {
+    document.getElementById('cFechaTercero').value=hoy();
+    document.getElementById('cNombreTercero').value='';
+    document.getElementById('cDescTercero').value='';
+    actualizarSelectorProd();
+    document.getElementById('errCostTercero').style.display='none';
+  }
+}
+
+function getProdById(id){return producciones.find(p=>String(p.id)===String(id));}
+
+function confirmarCosturaFabrica(){
+  const fecha=document.getElementById('cFechaFabrica').value.trim();
+  const prodId=document.getElementById('cProdSel').value;
+  const err=document.getElementById('errCostFabrica');
+  if(!fecha||fecha.length<10||!prodId){err.style.display='block';return;}
+  err.style.display='none';
+  const prod=getProdById(prodId);
+  if(!prod){alert('Producción no encontrada.');return;}
+
+  costuras.push({
+    id:generarId(),fecha,lugar:'fabrica',
+    produccionId:String(prod.id),
+    produccionRef:prod,
+    producto:prod.producto,tipoTela:prod.tipoTela,
+    totalPrendas:prod.totalPrendas,
+    colores:prod.colores,talles:prod.talles,
+    cantPorColorTalle:prod.cantPorColorTalle,
+    porColor:prod.porColor,
+    estado:'pendiente',nombre:'',descripcion:'',fechaFin:''
+  });
+  // descontar de producciones
+  producciones=producciones.filter(p=>String(p.id)!==String(prodId));
+  renderProducciones();
+  ocultarFormsCostura();
+  renderCosturas();
+}
+
+function confirmarCosturaTercero(){
+  const fecha=document.getElementById('cFechaTercero').value.trim();
+  const nombre=document.getElementById('cNombreTercero').value.trim();
+  const desc=document.getElementById('cDescTercero').value.trim();
+  const prodId=document.getElementById('cProdSelTercero').value;
+  const err=document.getElementById('errCostTercero');
+  if(!fecha||fecha.length<10||!nombre||!desc){err.style.display='block';return;}
+  err.style.display='none';
+
+  let prodRef=null,prodData={producto:'',tipoTela:'',totalPrendas:0,colores:[],talles:[],cantPorColorTalle:{},porColor:{}};
+  if(prodId){
+    prodRef=getProdById(prodId);
+    if(prodRef){
+      prodData={producto:prodRef.producto,tipoTela:prodRef.tipoTela,totalPrendas:prodRef.totalPrendas,
+        colores:prodRef.colores,talles:prodRef.talles,cantPorColorTalle:prodRef.cantPorColorTalle,porColor:prodRef.porColor};
+      // descontar de producciones
+      producciones=producciones.filter(p=>String(p.id)!==String(prodId));
+      renderProducciones();
+    }
+  }
+  costuras.push({
+    id:generarId(),fecha,lugar:'tercero',
+    produccionId:prodId||'',
+    produccionRef:prodRef,
+    ...prodData,
+    estado:'pendiente',nombre,descripcion:desc,fechaFin:''
+  });
+  ocultarFormsCostura();
+  renderCosturas();
+}
+
+function ocultarFormsCostura(){
+  document.getElementById('costuraTipoSel').classList.add('hidden');
+  document.getElementById('costuraFormFabrica').classList.add('hidden');
+  document.getElementById('costuraFormTercero').classList.add('hidden');
+}
+
+function renderCosturas(){
+  const pend=costuras.filter(c=>c.estado==='pendiente');
+  const fin=costuras.filter(c=>c.estado==='finalizada').reverse();
+  document.getElementById('conteoCostPend').textContent=pend.length;
+  document.getElementById('conteoCostFin').textContent=fin.length;
+  const btn=document.getElementById('btnVerTodasCost');
+  if(fin.length>5){btn.style.display='inline-flex';btn.textContent=verTodasCost?'Ver menos':`Ver finalizadas (${fin.length})`;}
+  else btn.style.display='none';
+
+  // Pendientes
+  const pendList=document.getElementById('costuraPendList');
+  pendList.innerHTML='';
+  if(pend.length>0){
+    const lbl=document.createElement('div');lbl.className='list-section-label';lbl.textContent='Pendientes';
+    pendList.appendChild(lbl);
+    pend.forEach(c=>{ pendList.appendChild(buildCosturaCard(c,true)); });
+  }
+
+  // Finalizadas
+  const finList=document.getElementById('costuraFinList');
+  finList.innerHTML='';
+  const mostrar=verTodasCost?fin:fin.slice(0,5);
+  if(mostrar.length>0){
+    const lbl=document.createElement('div');lbl.className='list-section-label';lbl.textContent='Finalizadas';
+    finList.appendChild(lbl);
+    mostrar.forEach(c=>{ finList.appendChild(buildCosturaCard(c,false)); });
+  }
+}
+
+function buildCosturaCard(c,conBoton){
+  const div=document.createElement('div');
+  div.className=`costura-item ${c.estado}`;
+  const tid=`ct_${c.id}`;
+  const lugarStr=c.lugar==='fabrica'?'Fábrica':`Tercero – ${c.nombre}`;
+  const descStr=c.lugar==='tercero'?` · ${c.descripcion}`:'';
+  const fechaStr=conBoton
+    ? `${c.fecha} · ${lugarStr}${descStr}`
+    : `Ingreso: ${c.fecha} → Entrega: ${c.fechaFin} · ${lugarStr}${descStr}`;
+
+  const pcStr=c.colores&&c.colores.length
+    ? c.colores.map(col=>`${col.charAt(0).toUpperCase()+col.slice(1)} ${c.porColor[col]||0}`).join(' · ')
+    : '';
+  const tallesExpandStr=c.colores&&c.colores.length
+    ? c.colores.map(col=>`${col} ${c.talles.map(t=>`T${t}.${c.cantPorColorTalle[col][t]}`).join(' ')}`).join(' — ')
+    : '';
+
+  const mainInfo=c.producto||c.tipoTela
+    ? `<div style="color:var(--text);font-size:.88rem;margin:4px 0;">${c.producto||''} · ${c.tipoTela||''} · ${c.totalPrendas||0} prendas</div>`
+    : '';
+  const colorInfo=pcStr
+    ? `<div style="color:var(--muted);font-size:.74rem;margin-top:2px;">${pcStr}${tallesExpandStr?`<button class="expandir-btn" onclick="toggleTalles('${tid}')">+</button>`:''}</div>
+       <div class="talles-expand" id="${tid}">${tallesExpandStr}</div>`
+    : '';
+
+  div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+    <div style="flex:1;">
+      <div style="color:var(--accent2);font-weight:500;font-size:.75rem;">${fechaStr}</div>
+      ${mainInfo}${colorInfo}
+      <div style="margin-top:6px;"><span class="badge badge-${c.estado==='pendiente'?'pend':'fin'}">${c.estado}</span></div>
+    </div>
+    ${conBoton?`<button class="btn btn-orange btn-xs" onclick="abrirFinCostura('${c.id}')">Finalizar</button>`:''}
+  </div>`;
+  return div;
+}
+
+function toggleVerTodasCost(){verTodasCost=!verTodasCost;renderCosturas();}
+function abrirFinCostura(id){
+  costFinalizandoId=id;
+  document.getElementById('mFechaFinCost').value=hoy();
+  document.getElementById('modalFinCost').classList.add('active');
+}
+function confirmarFinCost(){
+  const f=document.getElementById('mFechaFinCost').value.trim();
+  if(f.length<10){alert('Fecha inválida.');return;}
+  cerrarModal('modalFinCost');
+  const c=costuras.find(x=>x.id===costFinalizandoId);
+  if(c){c.estado='finalizada';c.fechaFin=f;}
+  costFinalizandoId=null;
+  renderCosturas();
+  renderStockFinal();
+}
+
+// TXT Costura
+function generarTxtCostura(){
+  return costuras.map(c=>{
+    const pcStr=c.colores&&c.colores.length
+      ? c.colores.map(col=>`${col} ${c.porColor[col]||0}`).join(' ')
+      : '-';
+    const tStr=c.colores&&c.colores.length&&c.talles&&c.talles.length
+      ? c.colores.map(col=>`${col} ${c.talles.map(t=>`T${t}.${(c.cantPorColorTalle[col]||{})[t]||0}`).join(' ')}`).join(' — ')
+      : '-';
+    return `------\nfecha ingreso: ${c.fecha}\nproduccion: ${c.produccionId||'-'}\nproducto: ${c.producto||'-'}\ntipo de tela: ${c.tipoTela||'-'}\ntotal prendas: ${c.totalPrendas||0}\npor color: ${pcStr}\ntalles: ${tStr}\nEstado: ${c.estado}\nlugar: ${c.lugar}\nnombre: ${c.nombre||'-'}\ndescripcion: ${c.descripcion||'-'}\nfecha de finalizacion: ${c.fechaFin||'-'}\n------`;
+  }).join('\n');
+}
+function descCostura(){
+  const f=document.getElementById('fechaDescInput').value.trim();
+  if(f.length<10){alert('Fecha inválida.');return;}
+  descargarArchivo(generarTxtCostura(),`Costura_${f.replace(/\//g,'-')}.txt`);
+  cerrarModal('modalDescarga');
+}
+function triggerCargarCostura(){
+  if(costuraYaCargada||costuras.length>0){alert('No se puede cargar costura si ya hay costuras.');return;}
+  document.getElementById('inputTxtCostura').click();
+}
+function cargarCostura(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>parsearTxtCostura(e.target.result);
+  reader.readAsText(file);
+  ev.target.value='';
+}
+function parsearTxtCostura(texto){
+  const COLS_CONOCIDOS=['negro','beige','azul marino','azul','verde','sin especificar'];
+  const bloques=texto.split(/\n?------\n/).filter(b=>b.trim());
+  let n=0;
+  bloques.forEach(bloque=>{
+    const lineas=bloque.split('\n').filter(l=>l.trim()&&!l.match(/^-{5,}$/));
+    const obj={};
+    const tallesLinea=lineas.find(l=>l.toLowerCase().startsWith('talles:'))||'';
+    const porColorLinea=lineas.find(l=>l.toLowerCase().startsWith('por color:'))||'';
+    lineas.forEach(l=>{
+      if(l.toLowerCase().startsWith('talles:')||l.toLowerCase().startsWith('por color:'))return;
+      const i=l.indexOf(':');if(i!==-1)obj[l.slice(0,i).trim().toLowerCase()]=l.slice(i+1).trim();
+    });
+    if(!obj['fecha ingreso'])return;
+
+    // Parsear por color
+    const porColor={};
+    const pcStr=(porColorLinea.replace(/^por color:\s*/i,'')||'').trim();
+    if(pcStr&&pcStr!=='-'){
+      COLS_CONOCIDOS.forEach(col=>{
+        const re=new RegExp('\\b'+col.replace(/ /g,'\\s+')+'\\s+(\\d+)','i');
+        const m=re.exec(pcStr);
+        if(m)porColor[col]=parseInt(m[1]);
+      });
+    }
+
+    // Parsear talles: "negro T44.2 T46.2 — azul T44.4"
+    const colores=[];const cantPorColorTalle={};const tallesSet=new Set();
+    const tStr=(tallesLinea.replace(/^talles:\s*/i,'')||'').trim();
+    if(tStr&&tStr!=='-'){
+      // Split por " — " primero, luego por color
+      const segmentos=tStr.split(/\s+—\s+/);
+      segmentos.forEach(seg=>{
+        let matchedColor=null;
+        COLS_CONOCIDOS.forEach(col=>{
+          const re=new RegExp('^'+col.replace(/ /g,'\\s+')+'\\b','i');
+          if(re.test(seg.trim()))matchedColor=col;
+        });
+        if(!matchedColor)return;
+        const color=matchedColor.toLowerCase();
+        colores.push(color);cantPorColorTalle[color]={};
+        const tokens=seg.match(/T(\d+)\.(\d+)/gi)||[];
+        tokens.forEach(tok=>{
+          const m=tok.match(/T(\d+)\.(\d+)/i);
+          if(m){const t=parseInt(m[1]),c=parseInt(m[2]);cantPorColorTalle[color][t]=c;tallesSet.add(t);}
+        });
+      });
+    }
+    const talles=[...tallesSet].sort((a,b)=>a-b);
+
+    costuras.push({
+      id:generarId()+n,
+      fecha:obj['fecha ingreso'],lugar:obj.lugar||'fabrica',
+      produccionId:obj.produccion==='-'?'':obj.produccion||'',
+      produccionRef:null,
+      producto:obj.producto==='-'?'':obj.producto||'',
+      tipoTela:obj['tipo de tela']==='-'?'':obj['tipo de tela']||'',
+      totalPrendas:parseInt(obj['total prendas'])||0,
+      colores, talles, cantPorColorTalle, porColor,
+      estado:obj.estado||'pendiente',
+      nombre:obj.nombre==='-'?'':obj.nombre||'',
+      descripcion:obj.descripcion==='-'?'':obj.descripcion||'',
+      fechaFin:obj['fecha de finalizacion']==='-'?'':obj['fecha de finalizacion']||''
+    });
+    n++;
+  });
+  if(n>0){costuraYaCargada=true;renderCosturas();renderStockFinal();alert(`✓ Se cargaron ${n} costuras.`);}
+  else alert('No se encontraron costuras válidas.');
+}
+
+// ══════════════════════════════════════════════════
+//  STOCK FINAL (prendas + avíos)
+// ══════════════════════════════════════════════════
+let avios = []; // {tipo, cantidad}
+let stockFinalCargado = false;
+let formAvioVisible = false;
+
+const PRODUCTOS_FIJOS = [
+  'bombacha grafa','bombacha ripstop','bombacha gambardina',
+  'pantalon trabajo','pantalon cargo','camisas'
+];
+
+// Mapa producto costura → fila fija
+function normalizarProducto(prod, tela){
+  const p=(prod||'').toLowerCase().trim();
+  const t=(tela||'').toLowerCase().trim();
+  if(p==='bombacha') return `bombacha ${t}`;
+  if(p==='pantalon trabajo'||p==='pantalón trabajo') return 'pantalon trabajo';
+  if(p==='pantalon cargo'||p==='pantalón cargo') return 'pantalon cargo';
+  if(p==='camisas') return 'camisas';
+  // fallback: concatenar
+  return `${p} ${t}`.trim();
+}
+
+function sfColorFila(total){
+  if(total<=20) return 'sf-row-rojo';
+  if(total<=50) return 'sf-row-amarillo';
+  return 'sf-row-verde';
+}
+
+function calcularStockPrendas(){
+  // Suma costuras finalizadas por producto normalizado
+  const mapa={}; // key → {total, porColor:{}, cantPorColorTalle:{}, talles:Set, colores:[]}
+  PRODUCTOS_FIJOS.forEach(k=>{ mapa[k]={total:0,porColor:{},cantPorColorTalle:{},talles:new Set(),colores:[]}; });
+
+  costuras.filter(c=>c.estado==='finalizada').forEach(c=>{
+    const key=normalizarProducto(c.producto,c.tipoTela);
+    if(!mapa[key]) mapa[key]={total:0,porColor:{},cantPorColorTalle:{},talles:new Set(),colores:[]};
+    const m=mapa[key];
+    m.total+=(c.totalPrendas||0);
+    (c.colores||[]).forEach(col=>{
+      if(!m.porColor[col]) m.porColor[col]=0;
+      m.porColor[col]+=(c.porColor[col]||0);
+      if(!m.cantPorColorTalle[col]) m.cantPorColorTalle[col]={};
+      (c.talles||[]).forEach(t=>{
+        m.talles.add(t);
+        if(!m.cantPorColorTalle[col][t]) m.cantPorColorTalle[col][t]=0;
+        m.cantPorColorTalle[col][t]+=((c.cantPorColorTalle[col]||{})[t]||0);
+      });
+      if(!m.colores.includes(col)) m.colores.push(col);
+    });
+  });
+  return mapa;
+}
+
+function renderStockFinal(){
+  const mapa=calcularStockPrendas();
+  const tbody=document.getElementById('sfBodyPrendas');
+  tbody.innerHTML='';
+
+  // Mostrar todos: fijos primero, luego extras
+  const extras=Object.keys(mapa).filter(k=>!PRODUCTOS_FIJOS.includes(k));
+  [...PRODUCTOS_FIJOS,...extras].forEach(key=>{
+    const d=mapa[key]||{total:0,porColor:{},cantPorColorTalle:{},talles:new Set(),colores:[]};
+    const tallesArr=[...d.talles].sort((a,b)=>a-b);
+    const pcStr=d.colores.length
+      ? d.colores.map(c=>`${c.charAt(0).toUpperCase()+c.slice(1)} ${d.porColor[c]||0}`).join(' · ')
+      : '—';
+    const tid=`sf_${key.replace(/ /g,'_')}`;
+    const tallesDetail=d.colores.length&&tallesArr.length
+      ? d.colores.map(c=>`<b>${c}</b> ${tallesArr.map(t=>`T${t}:${(d.cantPorColorTalle[c]||{})[t]||0}`).join(' ')}`).join('<br>')
+      : '—';
+
+    const tr=document.createElement('tr');
+    tr.className=sfColorFila(d.total);
+    tr.innerHTML=`<td class="sf-nombre">${key}</td>
+      <td class="sf-total">${d.total}</td>
+      <td class="sf-detail">
+        ${pcStr}
+        ${tallesArr.length?`<button class="expandir-btn" onclick="toggleSfDetail('${tid}')">+</button>`:''}
+        <div class="talles-expand" id="${tid}" style="margin-top:4px;">${tallesDetail}</div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+  renderAvios();
+}
+
+function toggleSfDetail(id){
+  const el=document.getElementById(id);if(!el)return;
+  el.classList.toggle('open');
+  const btn=el.previousElementSibling;
+  if(btn&&btn.classList.contains('expandir-btn')) btn.textContent=el.classList.contains('open')?'−':'+';
+}
+
+function renderAvios(){
+  const tbody=document.getElementById('sfBodyAvios');
+  tbody.innerHTML='';
+  // Acumular por tipo
+  const acum={};
+  avios.forEach(a=>{ acum[a.tipo]=(acum[a.tipo]||0)+a.cantidad; });
+  // Siempre mostrar hilos y botones aunque sean 0
+  ['hilos','botones'].forEach(t=>{ if(acum[t]===undefined) acum[t]=0; });
+  Object.entries(acum).forEach(([tipo,cant])=>{
+    const tr=document.createElement('tr');
+    tr.className=sfColorFila(cant);
+    tr.innerHTML=`<td class="sf-nombre">${tipo}</td><td class="sf-total">${cant}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleFormAvio(){
+  formAvioVisible=!formAvioVisible;
+  document.getElementById('formAvio').classList.toggle('hidden',!formAvioVisible);
+  if(formAvioVisible){
+    document.getElementById('avTipo').value='';
+    document.getElementById('avCantidad').value='';
+    document.getElementById('errAvio').style.display='none';
+  }
+}
+
+function confirmarAvio(){
+  const tipo=document.getElementById('avTipo').value;
+  const cant=parseInt(document.getElementById('avCantidad').value);
+  const err=document.getElementById('errAvio');
+  if(!tipo||isNaN(cant)||cant<1){err.style.display='block';return;}
+  err.style.display='none';
+  avios.push({tipo,cantidad:cant});
+  toggleFormAvio();
+  renderAvios();
+}
+
+// ── TXT Stock Final ──
+function generarTxtStock(){
+  const mapa=calcularStockPrendas();
+  const extras=Object.keys(mapa).filter(k=>!PRODUCTOS_FIJOS.includes(k));
+  let txt='=== PRENDAS ===\n';
+  [...PRODUCTOS_FIJOS,...extras].forEach(key=>{
+    const d=mapa[key]||{total:0,porColor:{},cantPorColorTalle:{},talles:new Set(),colores:[]};
+    const tallesArr=[...d.talles].sort((a,b)=>a-b);
+    const pcStr=d.colores.map(c=>`${c} ${d.porColor[c]||0}`).join(' ') || '-';
+    const tStr=d.colores.length&&tallesArr.length
+      ? d.colores.map(c=>`${c} ${tallesArr.map(t=>`T${t}.${(d.cantPorColorTalle[c]||{})[t]||0}`).join(' ')}`).join(' — ')
+      : '-';
+    txt+=`-------\nproducto: ${key}\ntotal: ${d.total}\npor color: ${pcStr}\ntalles: ${tStr}\n------\n`;
+  });
+  txt+='\n=== AVIOS ===\n';
+  const acum={};
+  avios.forEach(a=>{ acum[a.tipo]=(acum[a.tipo]||0)+a.cantidad; });
+  ['hilos','botones'].forEach(t=>{ if(!acum[t]) acum[t]=0; });
+  Object.entries(acum).forEach(([tipo,cant])=>{
+    txt+=`-------\navio: ${tipo}\ncantidad: ${cant}\n------\n`;
+  });
+  return txt;
+}
+
+function descStock(){
+  const f=document.getElementById('fechaDescInput').value.trim();
+  if(f.length<10){alert('Fecha inválida.');return;}
+  descargarArchivo(generarTxtStock(),`Stock_${f.replace(/\//g,'-')}.txt`);
+  cerrarModal('modalDescarga');
+}
+
+function triggerCargarStockFinal(){
+  if(stockFinalCargado){alert('Solo se puede cargar el stock una vez.');return;}
+  document.getElementById('inputTxtStock').click();
+}
+
+function cargarStockFinal(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>parsearTxtStock(e.target.result);
+  reader.readAsText(file);
+  ev.target.value='';
+}
+
+function parsearTxtStock(texto){
+  // Parsear avíos (prendas se recalculan de costuras, no se cargan del txt)
+  const aviosMatch=texto.split('=== AVIOS ===')[1]||'';
+  const bloques=aviosMatch.split(/-------\n/).filter(b=>b.trim());
+  let n=0;
+  avios=[];
+  bloques.forEach(bloque=>{
+    const lineas=bloque.split('\n').filter(l=>l.trim()&&!l.match(/^-{5,}$/));
+    const obj={};
+    lineas.forEach(l=>{const i=l.indexOf(':');if(i!==-1)obj[l.slice(0,i).trim().toLowerCase()]=l.slice(i+1).trim();});
+    if(obj.avio&&obj.cantidad){
+      avios.push({tipo:obj.avio,cantidad:parseInt(obj.cantidad)||0});
+      n++;
+    }
+  });
+  stockFinalCargado=true;
+  document.getElementById('btnCargarStock').disabled=true;
+  renderStockFinal();
+  alert(`✓ Avíos cargados (${n}). Las prendas se calculan automáticamente de las costuras finalizadas.`);
+}
+
+// ── Inicialización ──
+renderRollos();
+renderStockFinal();
+
+</script>
+</body>
+</html>
