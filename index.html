@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aires de Campo – Ropa de Trabajo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --verde: #2d4a2d;--verde-medio: #3d6b3d;--verde-claro: #5a8a5a;
+      --beige: #f5ede0;--beige-oscuro: #e8d9c4;--marron: #6b4c2a;
+      --marron-claro: #a0734a;--blanco: #faf8f4;--negro: #1a1a18;
+      --gris: #6b6b68;--dorado: #c8a84b;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Barlow',sans-serif;background:var(--blanco);color:var(--negro);overflow-x:hidden}
+
+    /* KEYFRAMES */
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes slideLeft{from{opacity:0;transform:translateX(45px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes scaleIn{from{opacity:0;transform:scale(0.90)}to{opacity:1;transform:scale(1)}}
+    @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+    @keyframes arrowBounce{0%,100%{transform:rotate(45deg) translateY(-4px);opacity:.55}50%{transform:rotate(45deg) translateY(3px);opacity:1}}
+    @keyframes heroZoom{from{transform:scale(1.07)}to{transform:scale(1.15)}}
+    @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    @keyframes waPulse{0%,100%{box-shadow:0 6px 22px rgba(37,211,102,.5)}50%{box-shadow:0 6px 36px rgba(37,211,102,.8),0 0 0 12px rgba(37,211,102,.1)}}
+    @keyframes floatParticle{0%{opacity:0;transform:translateY(0) scale(1)}30%{opacity:.55}100%{opacity:0;transform:translateY(-130px) scale(.25)}}
+    @keyframes counterPop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+    @keyframes borderGlow{0%,100%{box-shadow:0 0 0 rgba(200,168,75,0)}50%{box-shadow:0 0 18px rgba(200,168,75,.35)}}
+
+    /* NAVBAR */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:1000;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 5%;height:70px;
+      background:rgba(26,26,24,0);backdrop-filter:blur(0);
+      border-bottom:1px solid rgba(200,168,75,0);
+      transition:background .5s,backdrop-filter .5s,border-color .5s;
+    }
+    nav.scrolled{background:rgba(26,26,24,.97);backdrop-filter:blur(18px);border-bottom-color:rgba(200,168,75,.2)}
+    .nav-logo{
+      font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;
+      color:var(--blanco);letter-spacing:.02em;text-decoration:none;
+      opacity:0;animation:fadeDown .8s .1s forwards;
+    }
+    .nav-logo span{color:var(--dorado)}
+    .nav-links{display:flex;gap:2rem;list-style:none}
+    .nav-links li{opacity:0;animation:fadeDown .6s forwards}
+    .nav-links li:nth-child(1){animation-delay:.3s}.nav-links li:nth-child(2){animation-delay:.4s}
+    .nav-links li:nth-child(3){animation-delay:.5s}.nav-links li:nth-child(4){animation-delay:.6s}
+    .nav-links li:nth-child(5){animation-delay:.7s}
+    .nav-links a{
+      color:rgba(250,248,244,.85);text-decoration:none;font-size:.82rem;font-weight:500;
+      letter-spacing:.1em;text-transform:uppercase;position:relative;padding-bottom:2px;transition:color .2s;
+    }
+    .nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--dorado);transition:width .3s}
+    .nav-links a:hover{color:var(--dorado)}.nav-links a:hover::after{width:100%}
+    .nav-cta{
+      background:var(--dorado);color:var(--negro);padding:.5rem 1.4rem;border-radius:3px;
+      font-weight:700;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;
+      transition:background .2s,transform .2s,box-shadow .2s;
+      opacity:0;animation:fadeDown .6s .85s forwards;
+    }
+    .nav-cta:hover{background:#d9b94e;transform:translateY(-1px);box-shadow:0 5px 18px rgba(200,168,75,.45)}
+    .hamburger{display:none;cursor:pointer;flex-direction:column;gap:5px}
+    .hamburger span{display:block;width:25px;height:2px;background:var(--blanco);transition:all .3s}
+
+    /* HERO */
+    .hero{min-height:100vh;position:relative;display:flex;align-items:center;overflow:hidden}
+    .hero-bg{
+      position:absolute;inset:0;
+      background:url('https://images.pexels.com/photos/247474/pexels-photo-247474.jpeg?auto=compress&cs=tinysrgb&w=1800') center/cover no-repeat;
+      transform:scale(1.07);animation:heroZoom 18s ease-in-out infinite alternate;
+    }
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(115deg,rgba(12,16,10,.93) 40%,rgba(45,74,45,.6) 100%)}
+    .hero-grain{
+      position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.3;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+    .hero-content{position:relative;z-index:2;padding:0 5%;max-width:800px}
+    .hero-badge{
+      display:inline-block;background:var(--dorado);color:var(--negro);
+      font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+      padding:.35rem 1rem;border-radius:2px;margin-bottom:1.8rem;
+      opacity:0;animation:fadeUp .7s .4s forwards;
+    }
+    .hero h1{
+      font-family:'Playfair Display',serif;font-size:clamp(2.8rem,6vw,5.8rem);
+      font-weight:900;color:var(--blanco);line-height:1.04;margin-bottom:1.3rem;
+      opacity:0;animation:fadeUp 1s .6s forwards;
+    }
+    .hero h1 em{color:var(--dorado);font-style:italic}
+    .hero p{
+      font-size:clamp(1rem,1.8vw,1.2rem);color:rgba(250,248,244,.8);
+      font-weight:300;line-height:1.72;margin-bottom:2.8rem;max-width:560px;
+      opacity:0;animation:fadeUp 1s .8s forwards;
+    }
+    .hero-btns{display:flex;gap:1rem;flex-wrap:wrap;opacity:0;animation:fadeUp 1s 1s forwards}
+    .btn-primary{
+      background:var(--dorado);color:var(--negro);padding:.9rem 2.2rem;
+      font-weight:700;font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;
+      text-decoration:none;border-radius:3px;border:none;cursor:pointer;
+      transition:all .3s;display:inline-flex;align-items:center;gap:.6rem;
+      position:relative;overflow:hidden;
+    }
+    .btn-primary::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.28) 50%,transparent 70%);
+      transform:translateX(-100%);transition:transform .55s;
+    }
+    .btn-primary:hover::after{transform:translateX(100%)}
+    .btn-primary:hover{background:#d9b94e;transform:translateY(-2px);box-shadow:0 10px 30px rgba(200,168,75,.5)}
+    .btn-secondary{
+      background:transparent;color:var(--blanco);padding:.9rem 2.2rem;
+      font-weight:600;font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;
+      text-decoration:none;border-radius:3px;border:2px solid rgba(250,248,244,.35);
+      cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;
+    }
+    .btn-secondary:hover{border-color:var(--dorado);color:var(--dorado);background:rgba(200,168,75,.08)}
+    .hero-stats{
+      position:absolute;bottom:3.5rem;right:5%;z-index:2;display:flex;gap:2.5rem;
+      opacity:0;animation:slideLeft 1s 1.3s forwards;
+    }
+    .stat{text-align:center}
+    .stat-num{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:800;color:var(--dorado);line-height:1}
+    .stat-label{font-size:.7rem;color:rgba(250,248,244,.6);letter-spacing:.12em;text-transform:uppercase;margin-top:.3rem}
+    .scroll-arrow{
+      position:absolute;bottom:2.4rem;left:50%;transform:translateX(-50%);z-index:2;
+      width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+      opacity:0;animation:fadeIn 1s 1.8s forwards;
+    }
+    .scroll-arrow::before{
+      content:'';display:block;width:14px;height:14px;
+      border-right:2px solid rgba(200,168,75,.75);border-bottom:2px solid rgba(200,168,75,.75);
+      animation:arrowBounce 1.5s ease-in-out infinite;
+    }
+
+    /* TICKER */
+    .ticker-wrap{background:var(--dorado);overflow:hidden;white-space:nowrap;padding:.65rem 0}
+    .ticker-inner{display:inline-flex;animation:ticker 24s linear infinite}
+    .ticker-inner:hover{animation-play-state:paused}
+    .ticker-item{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--negro);padding:0 2.5rem}
+    .ticker-sep{color:rgba(26,26,24,.35)}
+
+    /* SECTION HEADERS */
+    .section-tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--dorado);margin-bottom:.7rem}
+    .section-title{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,3.5vw,2.9rem);font-weight:900;line-height:1.12;color:var(--negro)}
+    .section-title.light{color:var(--blanco)}
+    .divider{width:60px;height:3px;background:linear-gradient(to right,var(--dorado),transparent);margin:1rem 0 1.5rem}
+    .divider.center{margin:1rem auto 1.5rem}
+
+    /* SOBRE */
+    .sobre{padding:7rem 5%;background:var(--beige);display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+    .sobre-img{
+      position:relative;border-radius:4px;overflow:hidden;aspect-ratio:4/3;
+      transform:translateX(-35px);opacity:0;transition:transform 1s cubic-bezier(.22,1,.36,1),opacity 1s;
+    }
+    .sobre-img.anim{transform:translateX(0);opacity:1}
+    .sobre-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 8s ease}
+    .sobre-img:hover img{transform:scale(1.05)}
+    .sobre-img::before{content:'';position:absolute;inset:-12px -12px 12px 12px;z-index:-1;border:2px solid var(--dorado);border-radius:4px;opacity:.4}
+    .sobre-text{transform:translateX(35px);opacity:0;transition:transform 1s .2s cubic-bezier(.22,1,.36,1),opacity 1s .2s}
+    .sobre-text.anim{transform:translateX(0);opacity:1}
+    .sobre-text p{font-size:1.05rem;line-height:1.8;color:var(--gris);font-weight:400;margin-bottom:1.5rem}
+    .sobre-values{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem}
+    .value-chip{
+      display:flex;align-items:center;gap:.5rem;background:white;padding:.6rem 1.1rem;border-radius:3px;
+      font-size:.82rem;font-weight:600;color:var(--verde);box-shadow:0 2px 10px rgba(0,0,0,.07);
+      transform:translateY(12px);opacity:0;transition:transform .5s,opacity .5s,box-shadow .25s,transform .25s;
+    }
+    .value-chip.anim{transform:translateY(0);opacity:1}
+    .value-chip:hover{box-shadow:0 8px 22px rgba(0,0,0,.14);transform:translateY(-3px) !important}
+    .value-chip::before{content:'✦';color:var(--dorado);font-size:.6rem}
+
+    /* CATEGORIAS */
+    .categorias{padding:7rem 5%;background:var(--verde);position:relative;overflow:hidden}
+    .categorias::after{
+      content:'COLECCIÓN';position:absolute;right:-2rem;bottom:-2rem;
+      font-family:'Barlow Condensed',sans-serif;font-size:10rem;font-weight:900;
+      color:rgba(255,255,255,.03);pointer-events:none;letter-spacing:-.03em;
+    }
+    .categorias .section-header{text-align:center;margin-bottom:3.5rem}
+    .cats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem}
+    .cat-card{
+      position:relative;border-radius:5px;overflow:hidden;aspect-ratio:3/4;cursor:pointer;
+      transform:translateY(45px);opacity:0;
+      transition:transform .75s cubic-bezier(.22,1,.36,1),opacity .75s,box-shadow .35s;
+    }
+    .cat-card.anim{transform:translateY(0);opacity:1}
+    .cat-card:hover{box-shadow:0 22px 55px rgba(0,0,0,.5)}
+    .cat-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .65s ease}
+    .cat-card:hover img{transform:scale(1.1)}
+    .cat-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(to top,rgba(12,16,10,.9) 35%,transparent 65%);
+      display:flex;flex-direction:column;justify-content:flex-end;padding:1.3rem;transition:background .4s;
+    }
+    .cat-card:hover .cat-overlay{background:linear-gradient(to top,rgba(12,16,10,.95) 50%,rgba(45,74,45,.35) 100%)}
+    .cat-name{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;color:var(--blanco);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem}
+    .cat-btn{
+      display:inline-block;background:var(--dorado);color:var(--negro);
+      padding:.4rem 1rem;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      border-radius:2px;transform:translateY(12px);opacity:0;transition:all .35s;cursor:pointer;border:none;
+    }
+    .cat-card:hover .cat-btn{transform:translateY(0);opacity:1}
+
+    /* CATALOGO */
+    .catalogo{padding:7rem 5%;background:var(--blanco)}
+    .catalogo .section-header{text-align:center;margin-bottom:1rem}
+    .filter-bar{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-bottom:3rem}
+    .filter-btn{
+      padding:.5rem 1.3rem;border-radius:3px;font-size:.78rem;font-weight:600;letter-spacing:.08em;
+      text-transform:uppercase;cursor:pointer;transition:all .25s;
+      background:transparent;border:2px solid var(--beige-oscuro);color:var(--gris);
+    }
+    .filter-btn.active,.filter-btn:hover{background:var(--verde);border-color:var(--verde);color:white;transform:translateY(-2px);box-shadow:0 5px 16px rgba(45,74,45,.35)}
+    .productos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.8rem}
+    .prod-card{
+      background:white;border-radius:6px;overflow:hidden;
+      box-shadow:0 2px 14px rgba(0,0,0,.08);
+      transition:transform .4s cubic-bezier(.22,1,.36,1),box-shadow .4s;cursor:pointer;
+      animation:scaleIn .5s both;
+    }
+    .prod-card:hover{transform:translateY(-8px);box-shadow:0 20px 45px rgba(0,0,0,.15)}
+    .prod-img{position:relative;aspect-ratio:4/3;overflow:hidden}
+    .prod-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .65s ease}
+    .prod-card:hover .prod-img img{transform:scale(1.09)}
+    .prod-img-overlay{
+      position:absolute;inset:0;background:rgba(45,74,45,0);
+      display:flex;align-items:center;justify-content:center;transition:background .35s;
+    }
+    .prod-card:hover .prod-img-overlay{background:rgba(45,74,45,.28)}
+    .prod-img-overlay span{
+      background:white;color:var(--verde);font-size:.75rem;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.2rem;border-radius:3px;
+      transform:scale(.8);opacity:0;transition:transform .3s,opacity .3s;
+    }
+    .prod-card:hover .prod-img-overlay span{transform:scale(1);opacity:1}
+    .prod-badge{
+      position:absolute;top:.8rem;left:.8rem;background:var(--verde);color:white;
+      font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      padding:.3rem .7rem;border-radius:2px;
+    }
+    .prod-info{padding:1.2rem}
+    .prod-cat{font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--marron-claro);margin-bottom:.3rem}
+    .prod-name{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--negro);margin-bottom:.4rem;line-height:1.3}
+    .prod-desc{font-size:.81rem;color:var(--gris);line-height:1.58;margin-bottom:1rem}
+    .prod-footer{display:flex;align-items:center;justify-content:space-between}
+    .prod-price{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;color:var(--verde)}
+    .prod-price span{font-size:.72rem;font-weight:400;color:var(--gris);font-family:'Barlow',sans-serif}
+    .btn-ver{
+      background:var(--verde);color:white;border:none;cursor:pointer;
+      padding:.5rem 1.1rem;border-radius:3px;font-size:.75rem;font-weight:700;
+      letter-spacing:.08em;text-transform:uppercase;transition:background .2s,transform .2s;
+    }
+    .btn-ver:hover{background:var(--verde-medio);transform:scale(1.05)}
+
+    /* COUNTER STRIP */
+    .counter-strip{background:var(--negro);padding:3.5rem 5%;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
+    .counter-item{text-align:center;position:relative}
+    .counter-item::after{content:'';position:absolute;right:0;top:20%;height:60%;width:1px;background:rgba(250,248,244,.08)}
+    .counter-item:last-child::after{display:none}
+    .counter-num{font-family:'Barlow Condensed',sans-serif;font-size:3.2rem;font-weight:900;color:var(--dorado);line-height:1}
+    .counter-label{font-size:.75rem;color:rgba(250,248,244,.55);letter-spacing:.15em;text-transform:uppercase;margin-top:.5rem}
+
+    /* DESTACADOS */
+    .destacados{
+      padding:7rem 5%;
+      background:linear-gradient(140deg,#0c100a 0%,#1a2614 50%,#0c100a 100%);
+      position:relative;overflow:hidden;
+    }
+    .dest-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .dest-particles span{position:absolute;width:2px;height:2px;background:var(--dorado);border-radius:50%;opacity:0;animation:floatParticle var(--dur) var(--delay) ease-in-out infinite}
+    .destacados::before{
+      content:'DESTACADOS';position:absolute;top:-1rem;right:2%;
+      font-family:'Barlow Condensed',sans-serif;font-size:9rem;font-weight:900;
+      color:rgba(255,255,255,.025);pointer-events:none;
+    }
+    .destacados .section-header{text-align:center;margin-bottom:3.5rem}
+    .destacados-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.5rem}
+    .dest-card{
+      background:rgba(255,255,255,.04);border:1px solid rgba(200,168,75,.18);
+      border-radius:6px;overflow:hidden;cursor:pointer;
+      transform:translateY(22px);opacity:0;
+      transition:all .45s cubic-bezier(.22,1,.36,1);
+    }
+    .dest-card.anim{transform:translateY(0);opacity:1}
+    .dest-card:hover{background:rgba(255,255,255,.09);border-color:rgba(200,168,75,.65);transform:translateY(-7px) !important;box-shadow:0 22px 55px rgba(0,0,0,.55)}
+    .dest-img{aspect-ratio:1;overflow:hidden;position:relative}
+    .dest-img img{width:100%;height:100%;object-fit:cover;transition:transform .55s}
+    .dest-card:hover .dest-img img{transform:scale(1.11)}
+    .dest-shine{
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,transparent 40%,rgba(200,168,75,.18) 50%,transparent 60%);
+      transform:translateX(-100%);transition:transform .55s;
+    }
+    .dest-card:hover .dest-shine{transform:translateX(100%)}
+    .dest-info{padding:1.1rem}
+    .dest-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--blanco);margin-bottom:.4rem}
+    .dest-price{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:var(--dorado)}
+    .dest-stars{color:var(--dorado);font-size:.72rem;margin-bottom:.3rem;letter-spacing:.1em}
+
+    /* BANNER CTA */
+    .banner-cta{padding:6rem 5%;background:var(--beige);display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+    .banner-text .section-title{font-size:clamp(1.6rem,3vw,2.5rem)}
+    .banner-text p{color:var(--gris);font-size:1rem;line-height:1.78;margin:1rem 0 2rem}
+    .banner-img{border-radius:5px;overflow:hidden;aspect-ratio:16/9}
+    .banner-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 8s ease}
+    .banner-img:hover img{transform:scale(1.04)}
+
+    /* FOOTER */
+    footer{background:#0c100a;color:rgba(250,248,244,.7);padding:5rem 5% 2rem}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:3rem;margin-bottom:3rem}
+    .footer-brand .logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--blanco);margin-bottom:.9rem;display:block}
+    .footer-brand .logo span{color:var(--dorado)}
+    .footer-brand p{font-size:.85rem;line-height:1.78;max-width:260px}
+    .footer-social{display:flex;gap:.8rem;margin-top:1.8rem}
+    .social-btn{
+      width:40px;height:40px;border-radius:50%;border:1px solid rgba(250,248,244,.18);
+      display:flex;align-items:center;justify-content:center;text-decoration:none;
+      font-size:1rem;transition:all .3s;background:transparent;
+    }
+    .social-btn:hover{border-color:var(--dorado);background:rgba(200,168,75,.14);transform:translateY(-2px)}
+    .footer-col h4{font-size:.78rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dorado);margin-bottom:1.3rem}
+    .footer-col ul{list-style:none}
+    .footer-col ul li{margin-bottom:.65rem}
+    .footer-col ul a{color:rgba(250,248,244,.6);text-decoration:none;font-size:.85rem;transition:color .2s,padding-left .2s}
+    .footer-col ul a:hover{color:var(--blanco);padding-left:5px}
+    .footer-contact-item{display:flex;gap:.7rem;align-items:flex-start;margin-bottom:.85rem;font-size:.85rem}
+    .footer-contact-item span:first-child{color:var(--dorado)}
+    .wa-btn{
+      display:inline-flex;align-items:center;gap:.6rem;background:#25d366;color:white;
+      padding:.75rem 1.5rem;border-radius:4px;text-decoration:none;font-weight:700;
+      font-size:.85rem;margin-top:1rem;transition:all .25s;letter-spacing:.05em;
+    }
+    .wa-btn:hover{background:#1ebe5d;transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.4)}
+    .footer-divider{height:1px;background:rgba(250,248,244,.08);margin-bottom:1.5rem}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+    .footer-bottom p{font-size:.78rem}
+
+    /* MODAL */
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;
+      display:flex;align-items:center;justify-content:center;padding:1rem;
+      opacity:0;pointer-events:none;transition:opacity .4s;backdrop-filter:blur(5px);
+    }
+    .modal-overlay.active{opacity:1;pointer-events:all}
+    .modal{
+      background:white;border-radius:10px;max-width:900px;width:100%;max-height:90vh;overflow-y:auto;
+      transform:translateY(28px) scale(.95);transition:transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .modal-overlay.active .modal{transform:translateY(0) scale(1)}
+    .modal-inner{display:grid;grid-template-columns:1fr 1fr}
+    .modal-img{overflow:hidden;border-radius:10px 0 0 10px}
+    .modal-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 6s ease}
+    .modal-overlay.active .modal-img img{transform:scale(1.05)}
+    .modal-content{padding:1.8rem;display:flex;flex-direction:column}
+    .modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--gris);padding:.2rem .5rem;align-self:flex-end;transition:color .2s,transform .3s;line-height:1}
+    .modal-close:hover{color:var(--negro);transform:rotate(90deg)}
+    .modal-cat{font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--marron-claro);margin-top:.4rem}
+    .modal-name{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--negro);margin:.4rem 0 .8rem;line-height:1.2}
+    .modal-desc{font-size:.88rem;color:var(--gris);line-height:1.78;margin-bottom:1.3rem}
+    .modal-price{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:var(--verde);margin-bottom:1.3rem}
+    .selector-label{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--negro);margin-bottom:.5rem}
+    .talle-opts,.color-opts{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1.2rem}
+    .talle-btn{border:2px solid var(--beige-oscuro);background:none;padding:.38rem .85rem;font-size:.8rem;font-weight:600;cursor:pointer;border-radius:3px;transition:all .2s}
+    .talle-btn.sel,.talle-btn:hover{border-color:var(--verde);background:var(--verde);color:white}
+    .color-btn{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .2s;outline:2px solid transparent;outline-offset:3px}
+    .color-btn.sel,.color-btn:hover{outline-color:var(--negro);transform:scale(1.2)}
+    .modal-btns{display:flex;flex-direction:column;gap:.7rem;margin-top:auto}
+    .btn-comprar{background:var(--verde);color:white;border:none;cursor:pointer;padding:.9rem;font-size:.88rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;transition:all .25s}
+    .btn-comprar:hover{background:var(--verde-medio);transform:translateY(-1px)}
+    .btn-wa-modal{background:#25d366;color:white;border:none;cursor:pointer;padding:.9rem;font-size:.88rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none}
+    .btn-wa-modal:hover{background:#1ebe5d;transform:translateY(-1px)}
+
+    /* WA FLOAT */
+    .wa-float{
+      position:fixed;bottom:1.8rem;right:1.8rem;z-index:999;
+      width:58px;height:58px;border-radius:50%;background:#25d366;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 22px rgba(37,211,102,.5);text-decoration:none;
+      animation:waPulse 2.5s ease-in-out infinite;transition:transform .2s;
+    }
+    .wa-float:hover{transform:scale(1.12);animation-play-state:paused}
+    .wa-float svg{width:30px;height:30px;fill:white}
+
+    /* MOBILE MENU */
+    .mobile-menu{display:none;position:fixed;inset:0;background:var(--negro);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+    .mobile-menu.open{display:flex}
+    .mobile-menu a{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--blanco);text-decoration:none;transition:color .2s}
+    .mobile-menu a:hover{color:var(--dorado)}
+    .mobile-menu-close{position:absolute;top:1.2rem;right:1.5rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){
+      .cats-grid{grid-template-columns:repeat(3,1fr)}
+      .footer-grid{grid-template-columns:1fr 1fr}
+      .counter-strip{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:768px){
+      .nav-links,.nav-cta{display:none}
+      .hamburger{display:flex}
+      .hero h1{font-size:2.5rem}
+      .hero-stats{display:none}
+      .sobre{grid-template-columns:1fr;gap:2.5rem}
+      .sobre-img{display:none}
+      .cats-grid{grid-template-columns:repeat(2,1fr)}
+      .banner-cta{grid-template-columns:1fr}
+      .banner-img{display:none}
+      .footer-grid{grid-template-columns:1fr;gap:2rem}
+      .footer-bottom{flex-direction:column;text-align:center}
+      .modal-inner{grid-template-columns:1fr}
+      .modal-img{border-radius:10px 10px 0 0;aspect-ratio:16/9}
+      .counter-strip{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:480px){
+      .cats-grid{grid-template-columns:repeat(2,1fr)}
+      .hero{min-height:100svh}
+      .hero-btns{flex-direction:column}
+      .btn-primary,.btn-secondary{text-align:center;justify-content:center}
+    }
+  </style>
+</head>
+<body>
+
+<!-- WA Float -->
+<a href="https://wa.me/5491100000000?text=Hola%2C%20quiero%20consultar%20sobre%20sus%20productos" class="wa-float" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Aires de <span>Campo</span></a>
+  <ul class="nav-links">
+    <li><a href="#sobre">Nosotros</a></li>
+    <li><a href="#categorias">Categorías</a></li>
+    <li><a href="#catalogo">Catálogo</a></li>
+    <li><a href="#destacados">Destacados</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a href="#catalogo" class="nav-cta">Ver catálogo</a>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="toggleMenu()">✕</button>
+  <a href="#sobre" onclick="toggleMenu()">Nosotros</a>
+  <a href="#categorias" onclick="toggleMenu()">Categorías</a>
+  <a href="#catalogo" onclick="toggleMenu()">Catálogo</a>
+  <a href="#destacados" onclick="toggleMenu()">Destacados</a>
+  <a href="#contacto" onclick="toggleMenu()">Contacto</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-content">
+    <span class="hero-badge">✦ Ropa de trabajo argentina</span>
+    <h1>Aires de <em>Campo</em> –<br/>Ropa de Trabajo</h1>
+    <p>Resistencia, comodidad y tradición para el trabajo diario. Prendas fabricadas para durar en el campo, la industria y más allá.</p>
+    <div class="hero-btns">
+      <a href="#catalogo" class="btn-primary">Ver catálogo ↓</a>
+      <a href="#sobre" class="btn-secondary">Conocer la marca</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">+500</div><div class="stat-label">Productos</div></div>
+    <div class="stat"><div class="stat-num">+10</div><div class="stat-label">Años</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Argentino</div></div>
+  </div>
+  <div class="scroll-arrow"></div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner" id="ticker"></div>
+</div>
+
+<!-- SOBRE -->
+<section class="sobre" id="sobre">
+  <div class="sobre-img" id="sobreImg">
+    <img src="assest/info.png" alt="Campo argentino" loading="lazy"/>
+  </div>
+  <div class="sobre-text" id="sobreText">
+    <span class="section-tag">✦ Nuestra historia</span>
+    <h2 class="section-title">Hechos para los que trabajan de verdad</h2>
+    <div class="divider"></div>
+    <p>Aires de Campo es una marca dedicada a la fabricación de ropa resistente para el trabajo rural y laboral. Diseñamos prendas duraderas, cómodas y pensadas para el día a día en el campo, el trabajo industrial y el sector de salud.</p>
+    <p>Cada prenda nace del entendimiento profundo de las necesidades reales del trabajador argentino. Materiales seleccionados, costuras reforzadas y cortes que permiten libertad de movimiento durante jornadas exigentes.</p>
+    <div class="sobre-values">
+      <span class="value-chip" style="transition-delay:.1s">Materiales premium</span>
+      <span class="value-chip" style="transition-delay:.2s">Fabricación nacional</span>
+      <span class="value-chip" style="transition-delay:.3s">Costuras reforzadas</span>
+      <span class="value-chip" style="transition-delay:.4s">Tallas amplias</span>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIAS -->
+<section class="categorias" id="categorias">
+  <div class="section-header">
+    <span class="section-tag" style="color:var(--dorado)">✦ Colecciones</span>
+    <h2 class="section-title light">Encontrá tu categoría</h2>
+    <div class="divider center"></div>
+  </div>
+  <div class="cats-grid" id="catsGrid">
+    <div class="cat-card" onclick="filterCat('bombacha')">
+      <img src="assest/hombre.png" alt="Hombres" loading="lazy"/>
+      <div class="cat-overlay"><div class="cat-name">Hombres</div><button class="cat-btn">Ver productos</button></div>
+    </div>
+    <div class="cat-card" onclick="filterCat('medica')">
+      <img src="assest/mujer.png" alt="Mujeres" loading="lazy"/>
+      <div class="cat-overlay"><div class="cat-name">Mujeres</div><button class="cat-btn">Ver productos</button></div>
+    </div>
+    <div class="cat-card" onclick="filterCat('guardapolvo')">
+      <img src="assest/nino.png" alt="Niños" loading="lazy"/>
+      <div class="cat-overlay"><div class="cat-name">Niños</div><button class="cat-btn">Ver productos</button></div>
+    </div>
+    <div class="cat-card" onclick="filterCat('medica')">
+      <img src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Ropa médica" loading="lazy"/>
+      <div class="cat-overlay"><div class="cat-name">Ropa Médica</div><button class="cat-btn">Ver productos</button></div>
+    </div>
+    <div class="cat-card" onclick="filterCat('guardapolvo')">
+      <img src="https://images.pexels.com/photos/3985163/pexels-photo-3985163.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Guardapolvos" loading="lazy"/>
+      <div class="cat-overlay"><div class="cat-name">Guardapolvos</div><button class="cat-btn">Ver productos</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- CATALOGO -->
+<section class="catalogo" id="catalogo">
+  <div class="section-header">
+    <span class="section-tag">✦ Nuestros productos</span>
+    <h2 class="section-title">Catálogo completo</h2>
+    <div class="divider center"></div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter(this,'todos')">Todos</button>
+    <button class="filter-btn" onclick="setFilter(this,'bombacha')">Bombachas de campo</button>
+    <button class="filter-btn" onclick="setFilter(this,'pantalon')">Pantalones</button>
+    <button class="filter-btn" onclick="setFilter(this,'medica')">Ropa médica</button>
+    <button class="filter-btn" onclick="setFilter(this,'guardapolvo')">Guardapolvos</button>
+  </div>
+  <div class="productos-grid" id="productosGrid"></div>
+</section>
+
+<!-- COUNTER -->
+<div class="counter-strip" id="counterStrip">
+  <div class="counter-item"><div class="counter-num" data-target="500">0</div><div class="counter-label">Productos en catálogo</div></div>
+  <div class="counter-item"><div class="counter-num" data-target="10">0</div><div class="counter-label">Años en el mercado</div></div>
+  <div class="counter-item"><div class="counter-num" data-target="8000">0</div><div class="counter-label">Clientes satisfechos</div></div>
+  <div class="counter-item"><div class="counter-num" data-target="23">0</div><div class="counter-label">Provincias con envío</div></div>
+</div>
+
+<!-- DESTACADOS -->
+<section class="destacados" id="destacados">
+  <div class="dest-particles" id="destParticles"></div>
+  <div class="section-header">
+    <span class="section-tag">✦ Los más elegidos</span>
+    <h2 class="section-title light">Productos destacados</h2>
+    <div class="divider center"></div>
+  </div>
+  <div class="destacados-grid" id="destacadosGrid"></div>
+</section>
+
+<!-- BANNER CTA -->
+<section class="banner-cta">
+  <div class="banner-text">
+    <span class="section-tag">✦ Pedidos mayoristas</span>
+    <h2 class="section-title">¿Necesitás equipar a tu equipo?</h2>
+    <div class="divider"></div>
+    <p>Trabajamos con empresas, cooperativas, establecimientos rurales y el sector de salud. Consultanos por pedidos al por mayor con precios especiales y entrega a todo el país.</p>
+    <a href="https://wa.me/5491100000000?text=Hola%2C%20quiero%20consultar%20pedidos%20mayoristas" class="btn-primary" target="_blank">Consultar por WhatsApp ↗</a>
+  </div>
+  <div class="banner-img">
+    <img src="https://imags.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Equipo de trabajo" loading="lazy"/>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contacto">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="logo">Aires de <span>Campo</span></span>
+      <p>Ropa de trabajo resistente, cómoda y fabricada en Argentina para quienes trabajan todos los días.</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn" aria-label="Instagram">📷</a>
+        <a href="https://wa.me/5491100000000" class="social-btn" target="_blank" aria-label="WhatsApp">💬</a>
+        <a href="#" class="social-btn" aria-label="Facebook">📘</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Categorías</h4>
+      <ul>
+        <li><a href="#catalogo">Bombachas de campo</a></li>
+        <li><a href="#catalogo">Pantalones de trabajo</a></li>
+        <li><a href="#catalogo">Ropa médica</a></li>
+        <li><a href="#catalogo">Guardapolvos</a></li>
+        <li><a href="#catalogo">Ropa infantil</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Empresa</h4>
+      <ul>
+        <li><a href="#sobre">Quiénes somos</a></li>
+        <li><a href="#catalogo">Catálogo</a></li>
+        <li><a href="#">Mayoristas</a></li>
+        <li><a href="#">Envíos a todo el país</a></li>
+        <li><a href="#">Preguntas frecuentes</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <div class="footer-contact-item"><span>📍</span><span>Buenos Aires, Argentina</span></div>
+      <div class="footer-contact-item"><span>📞</span><span>+54 9 11 0000-0000</span></div>
+      <div class="footer-contact-item"><span>✉️</span><span>ventas@airesdecampo.com.ar</span></div>
+      <div class="footer-contact-item"><span>🕐</span><span>Lun–Vie 9 a 18 hs</span></div>
+      <a href="https://wa.me/5491100000000?text=Hola%2C%20quiero%20hacer%20una%20consulta" class="wa-btn" target="_blank">💬 Escribinos por WhatsApp</a>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-bottom">
+    <p>© 2025 Aires de Campo. Todos los derechos reservados.</p>
+    <p>Fabricado con orgullo en Argentina 🇦🇷</p>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-inner">
+      <div class="modal-img"><img id="modalImg" src="" alt=""/></div>
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-cat" id="modalCat"></div>
+        <h2 class="modal-name" id="modalName"></h2>
+        <p class="modal-desc" id="modalDesc"></p>
+        <div class="modal-price" id="modalPrice"></div>
+        <div class="selector-label">Talle</div>
+        <div class="talle-opts" id="talleOpts"></div>
+        <div class="selector-label">Color</div>
+        <div class="color-opts" id="colorOpts"></div>
+        <div class="modal-btns">
+          <button class="btn-comprar" onclick="comprar()">🛒 Agregar al carrito</button>
+          <a class="btn-wa-modal" id="modalWaBtn" href="#" target="_blank">💬 Consultar por WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const productos=[
+  {id:1,cat:'bombacha',catLabel:'Bombachas de campo',nombre:'Bombacha de campo de gabardina',desc:'Fabricada en gabardina de alta resistencia con refuerzo interno. Corte tradicional argentino con bolsillos laterales doble costura. Ideal para jinetes y trabajadores rurales que necesitan libertad de movimiento durante jornadas largas.',precio:18500,destacado:false,img:'assest/hombre.png',talles:['38','40','42','44','46','48','50','52'],colores:['#5c4033','#1a2e1a','#1a1a18']},
+  {id:2,cat:'bombacha',catLabel:'Bombachas de campo',nombre:'Bombacha de campo antidesgarre',desc:'Material técnico antidesgarre con doble capa en zonas de mayor rozamiento. Diseñada para las tareas más exigentes del campo argentino. Costuras reforzadas y cintura elástica cómoda para todo el día.',precio:22000,destacado:true,img:'assest/hombre.png',talles:['38','40','42','44','46','48','50'],colores:['#5c4033','#1a2e1a','#3d3d35']},
+  {id:3,cat:'bombacha',catLabel:'Bombachas de campo',nombre:'Bombacha de campo mil rayas',desc:'Tejido mil rayas clásico, liviano y altamente transpirable. Perfecta para el verano y jornadas largas. Costuras francesas de alta duración que garantizan años de uso.',precio:16500,destacado:false,img:'assest/hombre.png',talles:['38','40','42','44','46','48'],colores:['#c0a080','#5c4033','#3d3d35']},
+  {id:4,cat:'pantalon',catLabel:'Pantalones de trabajo',nombre:'Pantalón cargo de trabajo',desc:'Pantalón con múltiples bolsillos cargo reforzados, cintura elástica ajustable y rodilleras. Tela 100% algodón rip-stop resistente al desgaste. Favorito de electricistas, mecánicos y operarios.',precio:19800,destacado:false,img:'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=600',talles:['38','40','42','44','46','48','50'],colores:['#1a2e1a','#3d3d35','#5c4033']},
+  {id:5,cat:'pantalon',catLabel:'Pantalones de trabajo',nombre:'Pantalón reforzado de trabajo',desc:'Construcción en denim grueso 14oz con parches de refuerzo en rodillas y trasero. Corte ergonómico para máxima movilidad. Tratamiento repelente al aceite y grasas industriales.',precio:24500,destacado:true,img:'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=600',talles:['38','40','42','44','46','48'],colores:['#1a2e1a','#1a1a18','#3a2e20']},
+  {id:6,cat:'medica',catLabel:'Ropa médica',nombre:'Ambo médico unisex',desc:'Tela suave antimicrobiana con tecnología de secado rápido. Corte unisex moderno. Disponible en colores institucionales. Cumple todas las normativas sanitarias argentinas.',precio:15200,destacado:true,img:'https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=600',talles:['XS','S','M','L','XL','XXL'],colores:['#2d6b8a','#2d4a2d','#ffffff','#7a2d2d']},
+  {id:7,cat:'medica',catLabel:'Ropa médica',nombre:'Ambo médico para mujer',desc:'Diseño femenino con corte entallado, cuello en V y bolsillos funcionales. Tela stretch 4 vías de alta comodidad para largas jornadas laborales en salud.',precio:16800,destacado:false,img:'https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=600',talles:['XS','S','M','L','XL','XXL'],colores:['#2d6b8a','#6b2d6b','#ffffff','#2d4a2d']},
+  {id:8,cat:'medica',catLabel:'Ropa médica',nombre:'Ambo médico para hombre',desc:'Corte recto clásico con bolsillos amplios de fácil acceso. Material robusto y resistente al lavado frecuente a alta temperatura sin deformarse ni desteñir.',precio:15500,destacado:false,img:'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=600',talles:['XS','S','M','L','XL','XXL'],colores:['#1a2e4a','#2d4a2d','#1a1a18']},
+  {id:9,cat:'guardapolvo',catLabel:'Guardapolvos',nombre:'Guardapolvo escolar',desc:'El clásico guardapolvo blanco argentino. Tela de popelín de alta calidad, fácil lavado y planchado. Botones resistentes nacarados y bolsillos funcionales. Luce impecable todo el ciclo escolar.',precio:9800,destacado:true,img:'assest/guardapolvo.png',talles:['2','4','6','8','10','12','14','16'],colores:['#ffffff','#f0f0f0']},
+  {id:10,cat:'guardapolvo',catLabel:'Guardapolvos',nombre:'Guardapolvo médico',desc:'Guardapolvo institucional para el sector de la salud. Tela antimicrobiana con cierre frontal completo. Disponible en varios colores para diferenciar especialidades.',precio:13500,destacado:false,img:'https://images.pexels.com/photos/3985163/pexels-photo-3985163.jpeg?auto=compress&cs=tinysrgb&w=600',talles:['XS','S','M','L','XL','XXL'],colores:['#ffffff','#2d6b8a','#2d4a2d']},
+  {id:11,cat:'guardapolvo',catLabel:'Guardapolvos',nombre:'Guardapolvo de trabajo',desc:'Resistente y funcional para talleres, laboratorios y comercios. Material reforzado en hombros y codos. Bolsillos amplios para herramientas y elementos de trabajo.',precio:11200,destacado:false,img:'assest/guardapolvo.png',talles:['S','M','L','XL','XXL','3XL'],colores:['#3d3d35','#1a2e1a','#3a2e20']}
+];
+
+/* TICKER */
+const tickerItems=['Bombachas de campo','Pantalones de trabajo','Ropa médica','Guardapolvos','Envío a todo el país','Fabricación nacional','Calidad garantizada','Pago en cuotas'];
+const tickerEl=document.getElementById('ticker');
+const html=tickerItems.map(t=>`<span class="ticker-item">${t} <span class="ticker-sep">✦</span></span>`).join('');
+tickerEl.innerHTML=html.repeat(4);
+
+/* RENDER */
+function renderProductos(filtro='todos'){
+  const grid=document.getElementById('productosGrid');
+  const items=filtro==='todos'?productos:productos.filter(p=>p.cat===filtro);
+  grid.innerHTML=items.map((p,i)=>`
+    <div class="prod-card" onclick="openModal(${p.id})" style="animation-delay:${i*.06}s">
+      <div class="prod-img">
+        <img src="${p.img}" alt="${p.nombre}" loading="lazy"/>
+        ${p.destacado?'<span class="prod-badge">Más vendido</span>':''}
+        <div class="prod-img-overlay"><span>Ver producto</span></div>
+      </div>
+      <div class="prod-info">
+        <div class="prod-cat">${p.catLabel}</div>
+        <div class="prod-name">${p.nombre}</div>
+        <div class="prod-desc">${p.desc.substring(0,82)}…</div>
+        <div class="prod-footer">
+          <div class="prod-price">$${p.precio.toLocaleString('es-AR')} <span>ARS</span></div>
+          <button class="btn-ver">Ver más</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderDestacados(){
+  const grid=document.getElementById('destacadosGrid');
+  const items=productos.filter(p=>p.destacado);
+  grid.innerHTML=items.map(p=>`
+    <div class="dest-card" onclick="openModal(${p.id})">
+      <div class="dest-img">
+        <img src="${p.img}" alt="${p.nombre}" loading="lazy"/>
+        <div class="dest-shine"></div>
+      </div>
+      <div class="dest-info">
+        <div class="dest-stars">★★★★★</div>
+        <div class="dest-name">${p.nombre}</div>
+        <div class="dest-price">$${p.precio.toLocaleString('es-AR')}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* FILTER */
+function setFilter(btn,cat){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProductos(cat);
+}
+function filterCat(cat){
+  document.getElementById('catalogo').scrollIntoView({behavior:'smooth'});
+  setTimeout(()=>{
+    const btns=document.querySelectorAll('.filter-btn');
+    btns.forEach(b=>b.classList.remove('active'));
+    const match=[...btns].find(b=>b.getAttribute('onclick')?.includes(`'${cat}'`));
+    if(match){match.classList.add('active');renderProductos(cat);}
+    else{btns[0].classList.add('active');renderProductos('todos');}
+  },600);
+}
+
+/* MODAL */
+let selectedTalle=null,selectedColor=null;
+function openModal(id){
+  const p=productos.find(x=>x.id===id);if(!p)return;
+  selectedTalle=null;selectedColor=null;
+  document.getElementById('modalImg').src=p.img;
+  document.getElementById('modalImg').alt=p.nombre;
+  document.getElementById('modalCat').textContent=p.catLabel;
+  document.getElementById('modalName').textContent=p.nombre;
+  document.getElementById('modalDesc').textContent=p.desc;
+  document.getElementById('modalPrice').textContent=`$${p.precio.toLocaleString('es-AR')} ARS`;
+  document.getElementById('talleOpts').innerHTML=p.talles.map(t=>`<button class="talle-btn" onclick="selTalle(this,'${t}')">${t}</button>`).join('');
+  document.getElementById('colorOpts').innerHTML=p.colores.map(c=>`<button class="color-btn" style="background:${c}" onclick="selColor(this,'${c}')" title="${c}"></button>`).join('');
+  document.getElementById('modalWaBtn').href=`https://wa.me/5491100000000?text=Hola%2C%20quiero%20consultar%20sobre%20${encodeURIComponent(p.nombre)}`;
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('active');document.body.style.overflow='';}
+function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
+function selTalle(btn,t){document.querySelectorAll('.talle-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selectedTalle=t;}
+function selColor(btn,c){document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');selectedColor=c;}
+function comprar(){if(!selectedTalle){alert('Por favor seleccioná un talle antes de continuar.');return;}alert('✅ Producto agregado al carrito. Próximamente sistema de compra online.');}
+
+/* MOBILE MENU */
+function toggleMenu(){const m=document.getElementById('mobileMenu');m.classList.toggle('open');document.body.style.overflow=m.classList.contains('open')?'hidden':'';}
+
+/* NAVBAR */
+window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);});
+
+/* INTERSECTION OBSERVERS */
+const obsSobre=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.getElementById('sobreImg').classList.add('anim');
+      document.getElementById('sobreText').classList.add('anim');
+      document.querySelectorAll('.value-chip').forEach((c,i)=>setTimeout(()=>c.classList.add('anim'),100+i*130));
+    }
+  });
+},{threshold:.2});
+const sobreEl=document.querySelector('.sobre');if(sobreEl)obsSobre.observe(sobreEl);
+
+const obsCats=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting)document.querySelectorAll('.cat-card').forEach((c,i)=>setTimeout(()=>c.classList.add('anim'),i*95));});
+},{threshold:.15});
+const catsEl=document.querySelector('.cats-grid');if(catsEl)obsCats.observe(catsEl);
+
+const obsDest=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting)document.querySelectorAll('.dest-card').forEach((c,i)=>setTimeout(()=>c.classList.add('anim'),i*110));});
+},{threshold:.1});
+
+/* COUNTER */
+function animateCounter(el,target,dur=1900){
+  let startTime=null;
+  const prefix=target>=100?'+':'';
+  function step(ts){
+    if(!startTime)startTime=ts;
+    const p=Math.min((ts-startTime)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=prefix+Math.floor(ease*target).toLocaleString('es-AR');
+    if(p<1)requestAnimationFrame(step);
+    else{el.textContent=prefix+target.toLocaleString('es-AR');el.style.animation='counterPop .4s ease';}
+  }
+  requestAnimationFrame(step);
+}
+const obsCounter=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.counter-num').forEach(el=>animateCounter(el,+el.dataset.target));
+      obsCounter.unobserve(e.target);
+    }
+  });
+},{threshold:.4});
+const counterEl=document.getElementById('counterStrip');if(counterEl)obsCounter.observe(counterEl);
+
+/* PARTICLES */
+const pEl=document.getElementById('destParticles');
+for(let i=0;i<22;i++){const s=document.createElement('span');s.style.cssText=`left:${Math.random()*100}%;top:${55+Math.random()*45}%;--dur:${3+Math.random()*6}s;--delay:${Math.random()*5}s`;pEl.appendChild(s);}
+
+/* INIT */
+renderProductos();
+renderDestacados();
+setTimeout(()=>{const dg=document.querySelector('.destacados-grid');if(dg)obsDest.observe(dg);},100);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>
